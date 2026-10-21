@@ -47,11 +47,14 @@ The evaluation protocol involves:
 
 ## 4. Work Distribution & Initial Roles
 
-| Member | Focus Area | Environment Setup |
+| Member | Focus Area & Assigned Tasks | Environment Setup |
 |---|---|---|
-| Louis Le Forestier | Repository setup, environment verification, access orchestration | Validated |
-| Maxime Laurent | SQL reference verification, test execution | Validated |
-| Baptiste Noailhac | Trace auditing, error taxonomy and reporting | Validated |
+| Louis Le Forestier | Reference queries C01-C03, Operator A (`groq:openai/gpt-oss-120b`), comparison synthesis | Validated |
+| Maxime Laurent | Reference queries C04-C06, Operator B (`groq:openai/gpt-oss-20b`), comparison synthesis | Validated |
+| Baptiste Noailhac | Reference queries C07-C09, Operator C (`openrouter:cohere/north-mini-code:free`), model summary | Validated |
+| Jean Jaunet | Reference queries C10-C13, Operator D (`groq:qwen/qwen3.8-27b`), model summary | Validated |
+| Alexandre Jullien Gaildraud | Reference queries C14-C17, Operator E (`openrouter:dots-studio/dots-3-note-preview:free`), report authoring | Validated |
+| Valentin Gourmelon | Reference queries C18-C20, sequential call coordination, master trace auditor & report authoring | Validated |
 
 ---
 
