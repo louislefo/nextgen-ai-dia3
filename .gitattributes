@@ -1,0 +1,6 @@
+# Ensure LF line endings for all data files to preserve cryptographic SHA-256 hashes
+* text=auto eol=lf
+*.csv text eol=lf
+*.sql text eol=lf
+*.json text eol=lf
+*.sqlite binary
