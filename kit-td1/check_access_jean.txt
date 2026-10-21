@@ -1,0 +1,12 @@
+[OK] python 3.12.8 (3.10 or later required)
+[OK] database boutique.sqlite -> sha256 0077e235...3398fec2, identical to manifest.json (seed 20260925)
+[OK] sqlite3 3.53.4 -> 5 products, 59 customers, 397 order lines, as in manifest.json
+[OK] csv product.csv, customers.csv, orders.csv -> fingerprints identical to manifest.json
+[OK] groq/openai/gpt-oss-120b -> OK
+[OK] groq/openai/gpt-oss-20b -> OK
+[OK] openrouter/cohere/north-mini-code:free -> OK
+[OK] groq/qwen/qwen3.8-27b -> OK
+[OK] openrouter/dots-studio/dots-3-note-preview:free -> OK
+
+5/5 models OK.
+Database and all required models OK: prerequisite met. Keep a screenshot of this output.
