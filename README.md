@@ -13,6 +13,9 @@ Pack version: `2026-10-14-students-1`
   - Louis Le Forestier (louis.le_forestier@edu.devinci.fr)
   - Maxime Laurent (maxime.laurent@edu.devinci.fr)
   - Baptiste Noailhac (baptiste.noailhac@edu.devinci.fr)
+  - Jean Jaunet (jean.jaunet@edu.devinci.fr)
+  - Alexandre Jullien Gaildraud (alexandre.jullien_gaildraud@edu.devinci.fr)
+  - Valentin Gourmelon (valentin.gourmelon@edu.devinci.fr)
 
 ## Environment & Prerequisites
 
