@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="TD 1 Comprehensive Results, Model Benchmarking and Error Taxonomy - ESILV DIA 3">
+  <title>TD 1: Multi-Model Evaluation &amp; Error Taxonomy | ESILV DIA 3</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <div class="header-accent"></div>
+  <div class="header-top">
+    <div class="brand-wrapper">
+      <span class="brand-badge">ESILV DIA 3</span>
+      <div>
+        <div class="brand-title">Trustworthy Generative AI Engineering</div>
+        <div class="brand-subtitle">Next-Generation AI (Didier Parisot) · Pack 2026-10-14-students-1</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a href="https://github.com/louislefo/nextgen-ai-dia3" class="github-link" target="_blank" rel="noopener">
+        <span>GitHub Repository</span>
+      </a>
+    </div>
+  </div>
+  <nav class="header-nav" aria-label="Main Navigation">
+    <a href="index.html" class="nav-item">Overview</a>
+    <a href="td1.html" class="nav-item active">TD 1: Model Benchmarking</a>
+    <a href="td2.html" class="nav-item">TD 2: Consensus &amp; Routing</a>
+    <a href="td3.html" class="nav-item">TD 3: Cost &amp; Trade-offs</a>
+  </nav>
+</header>
+
+<main>
+  <div class="meta-bar">
+    <span>Session: TD 1 (21 October 2026)</span>
+    <span>Dataset: boutique.sqlite (5 products, 59 customers, 397 order lines)</span>
+    <span>Base Calls: 100</span>
+    <span>Total Traces: 104</span>
+  </div>
+
+  <h1>TD 1: Multi-Model Evaluation &amp; Error Taxonomy</h1>
+  <p class="lead">
+    Full empirical benchmark comparing five authorized free language models on twenty structured e-commerce revenue questions against independently verified SQLite ground-truth references.
+  </p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-value" style="color: var(--green);">100%</div>
+      <div class="stat-label">GPT-OSS 120B</div>
+      <div class="stat-sub">20 / 20 correct (0 errors)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" style="color: var(--blue);">90%</div>
+      <div class="stat-label">GPT-OSS 20B</div>
+      <div class="stat-sub">18 / 20 correct (2 errors)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" style="color: var(--amber);">75%</div>
+      <div class="stat-label">Dots 3 Preview</div>
+      <div class="stat-sub">15 / 20 correct (2 syntax)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" style="color: var(--red);">65%</div>
+      <div class="stat-label">Cohere &amp; Qwen</div>
+      <div class="stat-sub">13 / 20 correct each</div>
+    </div>
+  </div>
+
+  <h2>1. Overall Evaluation Matrix (100 Base Calls)</h2>
+  <div class="tableau">
+    <table>
+      <thead>
+        <tr>
+          <th>Gate / Provider</th>
+          <th>Exact Model Identifier</th>
+          <th>Evaluated Cells</th>
+          <th>Correct (OK)</th>
+          <th>Wrong Value</th>
+          <th>Syntax Error</th>
+          <th>Not Executed (429)</th>
+          <th>Accuracy Rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Groq</strong></td>
+          <td><code>openai/gpt-oss-120b</code></td>
+          <td>20</td>
+          <td>20</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td><span class="badge ok">100.0% (20/20)</span></td>
+        </tr>
+        <tr>
+          <td><strong>Groq</strong></td>
+          <td><code>openai/gpt-oss-20b</code></td>
+          <td>20</td>
+          <td>18</td>
+          <td>2</td>
+          <td>0</td>
+          <td>0</td>
+          <td><span class="badge ok">90.0% (18/20)</span></td>
+        </tr>
+        <tr>
+          <td><strong>OpenRouter</strong></td>
+          <td><code>dots-studio/dots-3-note-preview:free</code></td>
+          <td>20</td>
+          <td>15</td>
+          <td>3</td>
+          <td>2</td>
+          <td>0</td>
+          <td><span class="badge warning">75.0% (15/20)</span></td>
+        </tr>
+        <tr>
+          <td><strong>OpenRouter</strong></td>
+          <td><code>cohere/north-mini-code:free</code></td>
+          <td>20</td>
+          <td>13</td>
+          <td>7</td>
+          <td>0</td>
+          <td>0</td>
+          <td><span class="badge error">65.0% (13/20)</span></td>
+        </tr>
+        <tr>
+          <td><strong>Groq</strong></td>
+          <td><code>qwen/qwen3.8-27b</code></td>
+          <td>20</td>
+          <td>13</td>
+          <td>5</td>
+          <td>0</td>
+          <td>2</td>
+          <td><span class="badge error">65.0% (13/20)</span></td>
+        </tr>
+        <tr style="font-weight: 700; background: #eef3f6;">
+          <td colspan="2">Aggregate Benchmark</td>
+          <td>100</td>
+          <td>79</td>
+          <td>17</td>
+          <td>2</td>
+          <td>2</td>
+          <td><span class="badge neutral">79.0% (79/100)</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>2. Performance by Question Family</h2>
+  <div class="cards">
+    <div class="card">
+      <div class="pill">Success Rate: 96.7%</div>
+      <h3 class="card-title">Period Queries (C01, C04, C05, C06, C07, C20)</h3>
+      <p>Questions requiring half-open timestamp intervals <code>[start, end)</code>. Exceptionally high success rate across all models. Only failure was Qwen on C20 due to HTTP 429 quota exhaustion.</p>
+    </div>
+    <div class="card">
+      <div class="pill">Success Rate: 100.0%</div>
+      <h3 class="card-title">Product List Queries (C03, C12, C13, C14)</h3>
+      <p>Questions requiring product identifier filters like <code>IN ('a', 'b', 'c')</code>. Flawlessly executed by all 5 models without syntax or logic divergences.</p>
+    </div>
+    <div class="card">
+      <div class="pill">Success Rate: 60.0%</div>
+      <h3 class="card-title">Customer Age &amp; Combined Queries (C02, C08-C11, C15-C19)</h3>
+      <p>Questions requiring exact completed age to the day and month. The primary point of divergence: lightweight models fail calendar arithmetic, making this the prime candidate for quorum consensus.</p>
+    </div>
+  </div>
+
+  <h2>3. Ground-Truth Reference Table (20 Questions Verified)</h2>
+  <p>Computed independently on <code>boutique.sqlite</code> and verified by cross-checking before any model execution:</p>
+
+  <div class="tableau">
+    <table>
+      <thead>
+        <tr>
+          <th>Case</th>
+          <th>Question Summary &amp; Logical Conditions</th>
+          <th>Revenue (Cents HT)</th>
+          <th>Revenue (Euros HT)</th>
+          <th>Lead Reviewer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>C01</strong></td><td>Period <code>2026-03-01</code> to <code>2026-06-01</code></td><td>792,800</td><td>7,928.00 EUR</td><td>Louis Le Forestier</td></tr>
+        <tr><td><strong>C02</strong></td><td>Customers exactly 25 on <code>2026-09-25</code> (all orders)</td><td>590,320</td><td>5,903.20 EUR</td><td>Louis Le Forestier</td></tr>
+        <tr><td><strong>C03</strong></td><td>Products a, b, c from <code>2026-01-01</code> to <code>2026-07-01</code></td><td>936,350</td><td>9,363.50 EUR</td><td>Louis Le Forestier</td></tr>
+        <tr><td><strong>C04</strong></td><td>Period <code>2026-01-01</code> to <code>2026-10-01</code></td><td>2,826,250</td><td>28,262.50 EUR</td><td>Maxime Laurent</td></tr>
+        <tr><td><strong>C05</strong></td><td>Period <code>2026-06-01</code> to <code>2026-06-02</code></td><td>38,480</td><td>384.80 EUR</td><td>Maxime Laurent</td></tr>
+        <tr><td><strong>C06</strong></td><td>Period <code>2025-01-01</code> to <code>2026-01-01</code> (zero records)</td><td>0</td><td>0.00 EUR</td><td>Maxime Laurent</td></tr>
+        <tr><td><strong>C07</strong></td><td>Period <code>2026-05-31</code> to <code>2026-06-01</code></td><td>13,970</td><td>139.70 EUR</td><td>Baptiste Noailhac</td></tr>
+        <tr><td><strong>C08</strong></td><td>Customers exactly 25 on <code>2026-09-24</code></td><td>605,580</td><td>6,055.80 EUR</td><td>Baptiste Noailhac</td></tr>
+        <tr><td><strong>C09</strong></td><td>Customers exactly 25 on <code>2026-09-26</code></td><td>487,980</td><td>4,879.80 EUR</td><td>Baptiste Noailhac</td></tr>
+        <tr><td><strong>C10</strong></td><td>Customers exactly 25 at the time of the order</td><td>558,980</td><td>5,589.80 EUR</td><td>Jean Jaunet</td></tr>
+        <tr><td><strong>C11</strong></td><td>Customers exactly 25 on <code>2026-12-01</code></td><td>446,690</td><td>4,466.90 EUR</td><td>Jean Jaunet</td></tr>
+        <tr><td><strong>C12</strong></td><td>Products a, b, c across all orders</td><td>1,666,490</td><td>16,664.90 EUR</td><td>Jean Jaunet</td></tr>
+        <tr><td><strong>C13</strong></td><td>Products a and c from <code>2026-04-01</code> to <code>2026-05-01</code></td><td>107,740</td><td>1,077.40 EUR</td><td>Jean Jaunet</td></tr>
+        <tr><td><strong>C14</strong></td><td>Products a, b, c from <code>2026-10-01</code> to <code>2026-12-01</code> (zero match)</td><td>0</td><td>0.00 EUR</td><td>Alexandre Jullien Gaildraud</td></tr>
+        <tr><td><strong>C15</strong></td><td>Period <code>03-01</code> to <code>06-01</code> + age 25 on <code>09-25</code></td><td>168,680</td><td>1,686.80 EUR</td><td>Alexandre Jullien Gaildraud</td></tr>
+        <tr><td><strong>C16</strong></td><td>Products a, b, c + age 25 on <code>09-25</code></td><td>376,740</td><td>3,767.40 EUR</td><td>Alexandre Jullien Gaildraud</td></tr>
+        <tr><td><strong>C17</strong></td><td>Products a, b, c + period <code>01-01</code> to <code>07-01</code> + age 25 on <code>09-25</code></td><td>258,180</td><td>2,581.80 EUR</td><td>Alexandre Jullien Gaildraud</td></tr>
+        <tr><td><strong>C18</strong></td><td>Period <code>05-01</code> to <code>06-01</code> + age 25 at order time</td><td>62,480</td><td>624.80 EUR</td><td>Valentin Gourmelon</td></tr>
+        <tr><td><strong>C19</strong></td><td>Product d + period <code>09-01</code> to <code>10-01</code> + age 25 on <code>09-25</code></td><td>1,990</td><td>19.90 EUR</td><td>Valentin Gourmelon</td></tr>
+        <tr><td><strong>C20</strong></td><td>Period <code>2026-06-01</code> to <code>2026-09-01</code></td><td>1,106,090</td><td>11,060.90 EUR</td><td>Valentin Gourmelon</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>4. Root Cause Analysis &amp; Failure Taxonomy</h2>
+  <p>A rigorous taxonomy distinguishes verifiable facts from interpretive hypotheses:</p>
+
+  <div class="cards">
+    <div class="card" style="border-left: 4px solid var(--red);">
+      <h3 class="card-title">Category 1: Rate Limiting &amp; Provider Quota (Observed Facts)</h3>
+      <p><strong>Affected Model:</strong> <code>groq:qwen/qwen3.8-27b</code> on cases <strong>C16</strong> and <strong>C20</strong>.</p>
+      <p><strong>Observed Evidence:</strong> Returned HTTP status <code>429</code>:</p>
+      <pre><code>Rate limit reached for model qwen/qwen3.8-27b on output tokens per minute (OTPM): Limit 1000, Used 865, Requested 186</code></pre>
+      <p><strong>Root Cause:</strong> Groq enforces an aggressive 1,000 OTPM ceiling on its free tier. Paced calls still saturated the quota during chain-of-thought generation, leaving the cell in <code>not_executed</code> status per retry constraints.</p>
+    </div>
+
+    <div class="card" style="border-left: 4px solid var(--amber);">
+      <h3 class="card-title">Category 2: Syntax Enclosure Hallucination (Observed Facts)</h3>
+      <p><strong>Affected Model:</strong> <code>openrouter:dots-studio/dots-3-note-preview:free</code> on cases <strong>C09</strong> and <strong>C17</strong>.</p>
+      <p><strong>Observed Evidence:</strong> Model hallucinated markdown enclosing backticks despite prompt instructions:</p>
+      <pre><code>```sql
+SELECT COALESCE(SUM(...), 0) AS revenue_cents FROM ...
+```</code></pre>
+      <p><strong>Root Cause:</strong> The SQLite authorizer sandbox rejects markdown decorators to prevent code injection. The token <code>```sql</code> caused immediate parser rejection (<code>sql_error</code>).</p>
+    </div>
+
+    <div class="card" style="border-left: 4px solid var(--blue);">
+      <h3 class="card-title">Category 3: Completed Age Calendar Arithmetic (Hypotheses &amp; Facts)</h3>
+      <p><strong>Affected Models:</strong> <code>cohere/north-mini-code</code> (0/5 on pure age), <code>qwen3.8-27b</code>, <code>gpt-oss-20b</code>.</p>
+      <p><strong>Observed Evidence:</strong> Compact models computed age as a raw difference of years:</p>
+      <pre><code>CAST(strftime('%Y', ref_date) AS INT) - CAST(strftime('%Y', birth_date) AS INT) = 25</code></pre>
+      <p><strong>Root Cause:</strong> This fails when the birthday has not yet occurred in the reference year. In contrast, <code>gpt-oss-120b</code> flawlessly generated the exact boundary check:</p>
+      <pre><code>strftime('%Y', ref_date) - strftime('%Y', birth_date) - (strftime('%m-%d', ref_date) &lt; strftime('%m-%d', birth_date)) = 25</code></pre>
+    </div>
+  </div>
+
+  <h2>5. Token Economics &amp; Portfolio Positioning</h2>
+  <div class="tableau">
+    <table>
+      <thead>
+        <tr>
+          <th>Model Identifier</th>
+          <th>Public Index</th>
+          <th>Paid Route Price (USD / 1M Input)</th>
+          <th>Paid Route Price (USD / 1M Output)</th>
+          <th>Access Used</th>
+          <th>Empirical TD1 Accuracy</th>
+          <th>Operational Limitations</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>openai/gpt-oss-120b</code></td>
+          <td>11.6</td>
+          <td>$0.15</td>
+          <td>$0.60</td>
+          <td>Groq Free</td>
+          <td><strong>100.0%</strong> (20/20)</td>
+          <td>High reasoning token latency; 1,000 OTPM quota on free tier.</td>
+        </tr>
+        <tr>
+          <td><code>openai/gpt-oss-20b</code></td>
+          <td>9.0</td>
+          <td>N/A</td>
+          <td>N/A</td>
+          <td>Groq Free</td>
+          <td><strong>90.0%</strong> (18/20)</td>
+          <td>Lightweight, fast; misses boundary edge cases on age queries.</td>
+        </tr>
+        <tr>
+          <td><code>dots-studio/dots-3-note-preview:free</code></td>
+          <td>N/A</td>
+          <td>$0.00</td>
+          <td>$0.00</td>
+          <td>OpenRouter Free</td>
+          <td><strong>75.0%</strong> (15/20)</td>
+          <td>Hallucinates markdown syntax; fails boundary date logic.</td>
+        </tr>
+        <tr>
+          <td><code>cohere/north-mini-code:free</code></td>
+          <td>N/A</td>
+          <td>$0.00</td>
+          <td>$0.00</td>
+          <td>OpenRouter Free</td>
+          <td><strong>65.0%</strong> (13/20)</td>
+          <td>Severe calendar arithmetic failures (0/5 on pure age).</td>
+        </tr>
+        <tr>
+          <td><code>qwen/qwen3.8-27b</code></td>
+          <td>33.7</td>
+          <td>N/A</td>
+          <td>N/A</td>
+          <td>Groq Free</td>
+          <td><strong>65.0%</strong> (13/20)</td>
+          <td>Frequent HTTP 429 quota exhaustion (1,000 OTPM ceiling).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<footer>
+  <p>ESILV - Data &amp; Artificial Intelligence Major (Year 4 / S7) · Course: Next-Generation AI (Didier Parisot)</p>
+  <p>Engineering repository for Trustworthy Generative AI · Pack Version <code>2026-10-14-students-1</code></p>
+</footer>
+
+</body>
+</html>

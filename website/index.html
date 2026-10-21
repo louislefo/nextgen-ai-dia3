@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Engineering hub for Trustworthy Generative AI - ESILV Data & AI Major">
+  <title>Trustworthy Generative AI | ESILV DIA 3</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <div class="header-accent"></div>
+  <div class="header-top">
+    <div class="brand-wrapper">
+      <span class="brand-badge">ESILV DIA 3</span>
+      <div>
+        <div class="brand-title">Trustworthy Generative AI Engineering</div>
+        <div class="brand-subtitle">Next-Generation AI (Didier Parisot) · Pack 2026-10-14-students-1</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a href="https://github.com/louislefo/nextgen-ai-dia3" class="github-link" target="_blank" rel="noopener">
+        <span>GitHub Repository</span>
+      </a>
+    </div>
+  </div>
+  <nav class="header-nav" aria-label="Main Navigation">
+    <a href="index.html" class="nav-item active">Overview</a>
+    <a href="td1.html" class="nav-item">TD 1: Model Benchmarking</a>
+    <a href="td2.html" class="nav-item">TD 2: Consensus &amp; Routing</a>
+    <a href="td3.html" class="nav-item">TD 3: Cost &amp; Trade-offs</a>
+  </nav>
+</header>
+
+<main>
+  <div class="meta-bar">
+    <span>Course: Next-Generation AI (S7)</span>
+    <span>Sub-group: DIA 3 (Group 2)</span>
+    <span>Seed: 20260925</span>
+    <span>Pack Version: 2026-10-14-students-1</span>
+  </div>
+
+  <h1>Trustworthy Generative AI Engineering</h1>
+  <p class="lead">
+    A comprehensive engineering benchmark evaluating five large language models across structured e-commerce revenue queries. Implementing automatic difficulty routing, <em>k</em>-of-<em>n</em> quorum consensus verification, and token cost-reliability optimization.
+  </p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-value">20 / 20</div>
+      <div class="stat-label">Reference Queries</div>
+      <div class="stat-sub">100% verified on SQLite</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">104</div>
+      <div class="stat-label">Total LLM Calls</div>
+      <div class="stat-sub">100 base + 4 retries</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">5</div>
+      <div class="stat-label">Evaluated Models</div>
+      <div class="stat-sub">Groq &amp; OpenRouter</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">7</div>
+      <div class="stat-label">Team Members</div>
+      <div class="stat-sub">Distributed execution</div>
+    </div>
+  </div>
+
+  <aside class="notice final">
+    <p><strong>TD 1 Completed &amp; Verified</strong></p>
+    <p>All 20 ground-truth SQL references were computed on <code>data/boutique.sqlite</code> and validated against the instructor answer key. The 100-cell multi-model evaluation matrix is fully logged and analyzed with granular failure classifications.</p>
+  </aside>
+
+  <h2>The Core Problem: Confidence vs. Factual Correctness</h2>
+  <p>
+    In high-stakes business environments, language models generate plausible yet factually incorrect SQL statements with identical linguistic confidence. This repository implements the two fundamental pillars of trustworthy generative AI systems:
+  </p>
+  <ul>
+    <li><strong>Dynamic Routing:</strong> Selecting the most cost-effective model capable of handling a request's specific complexity level (e.g., lightweight models for simple timestamp filters, frontier models for multi-table join and date logic).</li>
+    <li><strong>Majority Voting Consensus:</strong> Querying heterogeneous models in parallel and accepting answers only when a <em>k</em>-of-<em>n</em> quorum is reached, with transparent abstention when models diverge.</li>
+  </ul>
+
+  <h2>Laboratory Curriculum &amp; Deliverables</h2>
+  <div class="cards">
+    <div class="card">
+      <div class="pill">Completed</div>
+      <h3 class="card-title"><a href="td1.html">TD 1: Multi-Model Evaluation &amp; Error Taxonomy</a></h3>
+      <p>Benchmarked 5 authorized free models (GPT-OSS 120B, GPT-OSS 20B, Dots 3 Preview, Cohere North Mini, Qwen 3.8 27B) across 20 revenue questions on <code>boutique.sqlite</code>.</p>
+      <ul>
+        <li>Reference calculation: 20/20 correct (0.00 EUR ground truth)</li>
+        <li>Failure taxonomy: HTTP 429 quota exhaustion, Markdown fence syntax errors, calendar age arithmetic bugs</li>
+        <li>Consolidated 104-call trace log with prompt fingerprints</li>
+      </ul>
+      <p><a href="td1.html">Explore TD 1 Results &rarr;</a></p>
+    </div>
+
+    <div class="card">
+      <div class="pill">In Preparation</div>
+      <h3 class="card-title"><a href="td2.html">TD 2: Quorum Consensus &amp; Routing Rules</a></h3>
+      <p>Implementation of <code>vote_k_sur_n</code> majority voting consensus and rule-based request routing based on query complexity.</p>
+      <ul>
+        <li>Majority voting across heterogeneous model panels</li>
+        <li>Abstention protocols when models diverge</li>
+        <li>Dynamic routing policy tested across 7 difficulty scenarios in <code>atelier-routage.py</code></li>
+      </ul>
+      <p><a href="td2.html">Explore TD 2 Architecture &rarr;</a></p>
+    </div>
+
+    <div class="card">
+      <div class="pill">Upcoming</div>
+      <h3 class="card-title"><a href="td3.html">TD 3: Cost-Performance Trade-offs &amp; Demonstration</a></h3>
+      <p>Economic modeling of production configurations, risk-weighted error costs, and live demonstration of trustworthy querying.</p>
+      <ul>
+        <li>Cost worksheet with dated, sourced token pricing</li>
+        <li>Error cost estimation across e-commerce operational workflows</li>
+        <li>Recorded demonstration of SQL generation, sandboxed execution, and quorum decision</li>
+      </ul>
+      <p><a href="td3.html">Explore TD 3 Framework &rarr;</a></p>
+    </div>
+  </div>
+
+  <h2>Sub-group Team &amp; Workload Partitioning</h2>
+  <p>To avoid provider rate limits (HTTP 429) and maintain strict reproducibility, workload is distributed across seven team members:</p>
+
+  <div class="team-grid">
+    <div class="member-card">
+      <div class="member-name">Louis Le Forestier</div>
+      <div class="member-email">louis.le_forestier@edu.devinci.fr</div>
+      <div class="member-role">Operator A (<code>gpt-oss-120b</code>, 20/20), Reference C01-C03, trace merger &amp; comparison synthesis.</div>
+    </div>
+    <div class="member-card">
+      <div class="member-name">Maxime Laurent</div>
+      <div class="member-email">maxime.laurent@edu.devinci.fr</div>
+      <div class="member-role">Operator B (<code>gpt-oss-20b</code>, 18/20), Reference C04-C06, comparison matrix authoring.</div>
+    </div>
+    <div class="member-card">
+      <div class="member-name">Baptiste Noailhac</div>
+      <div class="member-email">baptiste.noailhac@edu.devinci.fr</div>
+      <div class="member-role">Operator C (<code>cohere/north-mini-code</code>, 13/20), Reference C07-C09, five-model summary &amp; pricing.</div>
+    </div>
+    <div class="member-card">
+      <div class="member-name">Jean Jaunet</div>
+      <div class="member-email">jean.jaunet@edu.devinci.fr</div>
+      <div class="member-role">Operator D (<code>qwen3.8-27b</code>, 13/20), Reference C10-C13, model summary &amp; cross-checks.</div>
+    </div>
+    <div class="member-card">
+      <div class="member-name">Alexandre Jullien Gaildraud</div>
+      <div class="member-email">alexandre.jullien_gaildraud@edu.devinci.fr</div>
+      <div class="member-role">Operator E (<code>dots-3-note-preview</code>, 15/20), Reference C14-C17, session report &amp; taxonomy.</div>
+    </div>
+    <div class="member-card">
+      <div class="member-name">Valentin Gourmelon</div>
+      <div class="member-email">valentin.gourmelon@edu.devinci.fr</div>
+      <div class="member-role">Master Coordinator &amp; Auditor, Reference C18-C20, sequential call supervisor &amp; trace auditor.</div>
+    </div>
+    <div class="member-card">
+      <div class="member-name">Romain Thepaut</div>
+      <div class="member-email">romain.thepaut@edu.devinci.fr</div>
+      <div class="member-role">Quality Assurance &amp; Secondary Review, deliverable formatting, schema verification &amp; proofreading.</div>
+    </div>
+  </div>
+
+  <h2>System Architecture &amp; Execution Pipeline</h2>
+  <div class="tableau">
+    <table>
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Implementation</th>
+          <th>Security &amp; Integrity Safeguards</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Relational Database</strong></td>
+          <td>SQLite 3 (<code>data/boutique.sqlite</code>)</td>
+          <td>SHA-256 fingerprint checked against <code>manifest.json</code>; read-only access mode enforced.</td>
+        </tr>
+        <tr>
+          <td><strong>Sandboxed Execution</strong></td>
+          <td><code>sandbox_sqlite.py</code></td>
+          <td>Authorizer blocks all non-SELECT queries, table mutations, PRAGMA calls, and attached databases.</td>
+        </tr>
+        <tr>
+          <td><strong>Inference Engine</strong></td>
+          <td><code>skeleton-multi-llm-en.py</code></td>
+          <td>Common prompt fingerprint per question, temperature 0, 45-second timeout, maximum 1 retry.</td>
+        </tr>
+        <tr>
+          <td><strong>Audit &amp; Persistence</strong></td>
+          <td><code>traces-td1.csv</code> &amp; <code>.jsonl</code></td>
+          <td>Every call preserved with HTTP status, latency, token consumption, SQL query, and sandboxed output.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<footer>
+  <p>ESILV - Data &amp; Artificial Intelligence Major (Year 4 / S7) · Course: Next-Generation AI (Didier Parisot)</p>
+  <p>Engineering repository for Trustworthy Generative AI · Pack Version <code>2026-10-14-students-1</code></p>
+</footer>
+
+</body>
+</html>

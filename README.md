@@ -4,6 +4,7 @@ ESILV - Data & Artificial Intelligence Major (Year 4 / S7)
 Course: Next-Generation AI (Didier Parisot)  
 Pack version: `2026-10-14-students-1`  
 
+> Interactive Documentation & Results Portal: [https://louislefo.github.io/nextgen-ai-dia3/](https://louislefo.github.io/nextgen-ai-dia3/)  
 > Engineering repository for **Trustworthy Generative AI**: automatic model routing by request difficulty, k-of-n quorum consensus for high-stakes decision verification, and cost-performance trade-off modeling across an e-commerce database benchmark.
 
 ---
@@ -172,6 +173,12 @@ nextgen-ai-dia3/
 │   ├── README.md                       # TD 2 overview and objectives
 │   ├── atelier-vote.py                 # Majority voting quorum consensus harness
 │   └── atelier-routage.py              # Dynamic question routing harness
+├── website/                            # GitHub Pages portal (HTML/CSS results & tracking)
+│   ├── css/style.css                   # Polished lecture-inspired stylesheet
+│   ├── index.html                      # Executive project overview & team roster
+│   ├── td1.html                        # Comprehensive TD 1 evaluation, references & error taxonomy
+│   ├── td2.html                        # TD 2 voting quorum & routing rule architecture
+│   └── td3.html                        # TD 3 cost modeling & live demonstration framework
 └── templates/                          # Templates and worksheets for subsequent sessions (TD2 & TD3)
     ├── configuration-comparison-en.csv # Architecture and trade-off comparison matrix (TD3)
     ├── cost-calculation-en.csv         # Token consumption and operational cost accounting (TD3)
