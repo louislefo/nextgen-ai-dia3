@@ -1,0 +1,100 @@
+{
+ "seed": 20260925,
+ "schema_sha256": "fe25401e81549a61cbf074e2ceea9845430afebaa072e5ac6680136f3a0c0104",
+ "reference_date": "2026-09-25",
+ "order_window_utc": [
+  "2026-01-05 00:00:00",
+  "2026-09-20 23:59:59"
+ ],
+ "counts": {
+  "product": 5,
+  "customers": 59,
+  "orders": 397,
+  "distinct_orders": 221
+ },
+ "csv_sha256": {
+  "product.csv": "f4b41301a5bc3e03362215448d67d2439fc38352436c6b4cda57b9f2b5797e64",
+  "customers.csv": "f3053b6a89036a9cc426649798283b70dc882fc2d18034cde52e85614252100a",
+  "orders.csv": "5c92d3c6d2797b1ee007144c8d4bf2e43b8883037d893339d680205204988452"
+ },
+ "content_sha256": "a249822327443f1dbb2fc433567aa74fe25add715580690df9257b27b99cef40",
+ "sqlite_file_sha256": "0077e235adc2ca647b484e3083c98a6d7cae3ef3655ce366a299caf13398fec2",
+ "sqlite_version": "3.45.1",
+ "checks": [
+  {
+   "name": "foreign_key_check",
+   "ok": true,
+   "detail": "PRAGMA foreign_key_check"
+  },
+  {
+   "name": "integrity_check",
+   "ok": true,
+   "detail": "PRAGMA integrity_check"
+  },
+  {
+   "name": "order_after_customer_insert",
+   "ok": true,
+   "detail": "0 order lines dated before the customer's insert_date"
+  },
+  {
+   "name": "birth_before_insert",
+   "ok": true,
+   "detail": "0 customers born on or after their insert_date"
+  },
+  {
+   "name": "adult_at_insert",
+   "ok": true,
+   "detail": "0 customers under 18 at insert_date"
+  },
+  {
+   "name": "one_customer_and_date_per_order",
+   "ok": true,
+   "detail": "0 orders with several customers or dates"
+  },
+  {
+   "name": "no_duplicate_product_line",
+   "ok": true,
+   "detail": "0 duplicated (order_id, product_id)"
+  },
+  {
+   "name": "timestamp_format",
+   "ok": true,
+   "detail": "0 order lines with a malformed timestamp"
+  },
+  {
+   "name": "customer_date_formats",
+   "ok": true,
+   "detail": "0 customers with a malformed date"
+  },
+  {
+   "name": "no_leap_day_birthdays",
+   "ok": true,
+   "detail": "0 customers born on 29 February (kept out of this dataset)"
+  },
+  {
+   "name": "products_a_b_c_plus_other",
+   "ok": true,
+   "detail": "products: ['a', 'b', 'c', 'd', 'e']"
+  },
+  {
+   "name": "customers_without_orders",
+   "ok": true,
+   "detail": "9 customers without any order"
+  },
+  {
+   "name": "quantities_above_one",
+   "ok": true,
+   "detail": "334 order lines with quantity > 1"
+  },
+  {
+   "name": "multi_product_baskets",
+   "ok": true,
+   "detail": "128 orders with several products"
+  },
+  {
+   "name": "several_months",
+   "ok": true,
+   "detail": "months with orders: 2026-01 to 2026-09 (9)"
+  }
+ ]
+}

@@ -1,0 +1,141 @@
+{
+  "date": "2026-10-14",
+  "statut": "Sélection mise à jour le 14/10/2026 : cinq modèles obligatoires, identifiants et paramètres pour le TD.",
+  "source": "consigne-etudiante-en.md, sections 4 et 5",
+  "groq": {
+    "base_url": "https://api.groq.com/openai/v1",
+    "plan_requis": "Free, sans facturation activée",
+    "output_field": "max_completion_tokens",
+    "source": "https://console.groq.com/docs/rate-limits"
+  },
+  "openrouter": {
+    "base_url": "https://openrouter.ai/api/v1",
+    "output_field": "max_tokens",
+    "source": "https://openrouter.ai/api/v1/models",
+    "controle_fournisseur": "Assigner une allowlist aux clés ; vérifier son refus avant distribution"
+  },
+  "modeles": [
+    {
+      "rang": 1,
+      "gate": "groq",
+      "identifiant_exact": "openai/gpt-oss-120b",
+      "optionnel": false,
+      "parametres": {
+        "reasoning_effort": "low",
+        "max_completion_tokens": 1024
+      }
+    },
+    {
+      "rang": 2,
+      "gate": "groq",
+      "identifiant_exact": "openai/gpt-oss-20b",
+      "optionnel": false,
+      "parametres": {
+        "reasoning_effort": "low",
+        "max_completion_tokens": 1024
+      }
+    },
+    {
+      "rang": 3,
+      "gate": "openrouter",
+      "identifiant_exact": "cohere/north-mini-code:free",
+      "optionnel": false,
+      "parametres": {
+        "reasoning": {
+          "enabled": false
+        },
+        "max_tokens": 1024
+      }
+    },
+    {
+      "rang": 4,
+      "gate": "groq",
+      "identifiant_exact": "qwen/qwen3.8-27b",
+      "optionnel": false,
+      "parametres": {
+        "reasoning_effort": "none",
+        "max_completion_tokens": 1000
+      }
+    },
+    {
+      "rang": 5,
+      "gate": "openrouter",
+      "identifiant_exact": "dots-studio/dots-3-note-preview:free",
+      "optionnel": false,
+      "parametres": {
+        "reasoning": {
+          "enabled": false
+        },
+        "max_tokens": 1024
+      }
+    }
+  ],
+  "limites_pedagogiques": {
+    "requete_en_cours_par_sous_groupe": 1,
+    "intervalle_minimal_secondes": 3,
+    "temperature": 0,
+    "budget_entree_tokens_estime": 2000,
+    "sortie_max_tokens_raisonnement_compris": 1024,
+    "timeout_http_secondes": 45,
+    "reprises_max_par_requete": 1,
+    "retry_after_max_secondes": 60,
+    "appels_par_sous_groupe_et_seance": 100
+  },
+  "application": "100 appels initiaux pour le TD1, hors contrôles et reprises. Le quota réellement disponible de chaque compte et les limites du squelette priment. Ce fichier décrit le budget pédagogique ; il ne restreint pas le compte fournisseur.",
+  "budget_td1": {
+    "nature": "Budget opérationnel du TD1 : 100 cellules ; modèles actualisés le 14/10/2026.",
+    "cellules_nominales": 100,
+    "questions": 20,
+    "modeles_obligatoires": 5,
+    "appels_initiaux": {
+      "groq": 60,
+      "openrouter": 40
+    },
+    "repartition": [
+      {
+        "membre": "A",
+        "gate": "groq",
+        "modele": "openai/gpt-oss-120b",
+        "cellules": 20
+      },
+      {
+        "membre": "B",
+        "gate": "groq",
+        "modele": "openai/gpt-oss-20b",
+        "cellules": 20
+      },
+      {
+        "membre": "C",
+        "gate": "openrouter",
+        "modele": "cohere/north-mini-code:free",
+        "cellules": 20
+      },
+      {
+        "membre": "D",
+        "gate": "groq",
+        "modele": "qwen/qwen3.8-27b",
+        "cellules": 20
+      },
+      {
+        "membre": "E",
+        "gate": "openrouter",
+        "modele": "dots-studio/dots-3-note-preview:free",
+        "cellules": 20
+      }
+    ],
+    "comptes_openrouter_distincts_minimum": 2,
+    "controle_acces_par_execution": {
+      "groq": 3,
+      "openrouter": 2,
+      "inclut_optionnel": false
+    },
+    "marge_cible_par_operateur": 5,
+    "marge_regle": "Réserver cinq appels supplémentaires par opérateur pour contrôles et reprises si son quota restant le permet. Les compter séparément des vingt cellules. Si vingt plus la marge ne tiennent pas, réaffecter des cellules à un autre membre disposant de capacité ou passer au secours identifié.",
+    "reprises_max_par_cellule": 1,
+    "compteurs": "Chaque membre relève le quota restant de son compte, les contrôles déjà consommés, les cellules attribuées et les reprises. Une nouvelle clé ne crée pas de capacité.",
+    "coordination": "Une requête en cours à la fois pour le sous-groupe ; les cinq opérateurs se passent la main. Les membres F, G et H vérifient les références, fusionnent les traces et préparent les synthèses.",
+    "optionnel": "Aucun sixième modèle dans la sélection. Toute expérience supplémentaire a un budget distinct validé par l’encadrant.",
+    "secours": "Conserver les tentatives réalisées ; traiter les cellules restantes sur un lot fourni par l’encadrant, étiqueté réel historique, rejeu ou simulation et compté séparément.",
+    "td2_td3": "Aucun nouvel appel requis : vote et coût sur traces conservées. Toute expérience supplémentaire a son budget distinct validé par l’encadrant et ses fichiers propres."
+  }
+}
