@@ -1,6 +1,0 @@
-provider,model_id,public_index,index_date,index_source,paid_route_same_model,input_usd_per_million,output_usd_per_million,price_date,price_source,access_used,period_results,age_results,product_results,combined_results,trace_files,limits
-groq,openai/gpt-oss-120b,,,,,,,,,,,,,,,
-groq,openai/gpt-oss-20b,,,,,,,,,,,,,,,
-openrouter,inclusionai/ling-3.0-flash-sante:free,,,,,,,,,,,,,,,
-groq,qwen/qwen3.8-27b,,,,,,,,,,,,,,,
-openrouter,dots-studio/dots-3-note-preview:free,,,,,,,,,,,,,,,

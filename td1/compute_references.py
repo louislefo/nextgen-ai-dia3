@@ -7,7 +7,7 @@ import csv
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-DB_PATH = HERE / "kit-td1" / "data" / "boutique.sqlite"
+DB_PATH = HERE / "data" / "boutique.sqlite"
 
 QUERIES = {
     "C01": "SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id WHERE o.date >= '2026-03-01 00:00:00' AND o.date < '2026-06-01 00:00:00';",
@@ -47,7 +47,7 @@ def main():
     conn.close()
 
     # Write to reference-td1.csv
-    for target in [HERE / "reference-td1.csv", HERE / "td1" / "reference-td1.csv"]:
+    for target in [HERE / "reference-td1.csv"]:
         if target.parent.exists():
             with open(target, "w", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)

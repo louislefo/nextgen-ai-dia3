@@ -30,7 +30,6 @@ import sys
 import time
 from pathlib import Path
 
-
 HERE = Path(__file__).resolve().parent
 CONFIG = HERE / "modeles-autorises.json"
 DATABASE_NAME = "boutique.sqlite"
