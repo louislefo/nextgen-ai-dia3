@@ -1,4 +1,4 @@
-# Trustworthy Generative AI - DIA 3
+# Trustworthy Generative AI - DIA 3 - Group 1
 
 ESILV - Data & Artificial Intelligence Major (Year 4 / S7)  
 Course: Next-Generation AI (Didier Parisot)  
@@ -18,6 +18,7 @@ Pack version: `2026-10-14-students-1`
   4. **Jean Jaunet** (`jean.jaunet@edu.devinci.fr`)
   5. **Alexandre Jullien Gaildraud** (`alexandre.jullien_gaildraud@edu.devinci.fr`)
   6. **Valentin Gourmelon** (`valentin.gourmelon@edu.devinci.fr`)
+  7. **Romain Thepaut** (`romain.thepaut@edu.devinci.fr`)
 
 ---
 
@@ -26,7 +27,7 @@ Pack version: `2026-10-14-students-1`
 To ensure strict compliance with the course protocol, minimize rate-limiting hazards (HTTP 429), and guarantee high-accuracy deliverables, the workload across TD 1 is systematically partitioned among all six members.
 
 ### Phase 1: Ground-Truth SQL References (`reference-td1.csv`)
-Each member is assigned primary ownership of specific questions from [`questions-td1.json`](kit-td1/questions-td1.json) along with mandatory cross-verification of another member's queries on `boutique.sqlite`:
+Each member is assigned primary ownership of specific questions from [`questions-td1.json`](td1/questions-td1.json) along with mandatory cross-verification of another member's queries on `boutique.sqlite`:
 
 | Member | Assigned Questions | Question Focus | Cross-Checked By |
 |---|---|---|---|
@@ -36,6 +37,7 @@ Each member is assigned primary ownership of specific questions from [`questions
 | **Jean Jaunet** | **C10, C11, C12, C13** | Combined joins & multi-condition revenue queries | Baptiste Noailhac |
 | **Alexandre Jullien Gaildraud** | **C14, C15, C16, C17** | Aggregations, order status & volume constraints | Valentin Gourmelon |
 | **Valentin Gourmelon** | **C18, C19, C20** | Edge cases, boundary dates & zero-match scenarios | Alexandre Jullien Gaildraud |
+| **Romain Thepaut** | **Support / QA** | Secondary review & validation across C01–C20 | All Members |
 
 *Rule*: All reference revenue values must be integers in cents excluding VAT (`revenue_cents`), defaulting to `0` when no records match.
 
@@ -100,12 +102,12 @@ $env:OPENROUTER_API_KEY = "sk-or-v1-..."
 
 ### C. Running Integrity & Readiness Checks
 ```powershell
-cd kit-td1
+cd td1
 python verify-data.py
 python check_access.py --no-network
 ```
 
-### D. Operator Batch Commands (run from `kit-td1/`)
+### D. Operator Batch Commands (run from `td1/`)
 
 - **Operator A (Louis)**:
   ```powershell
@@ -138,31 +140,42 @@ python check_access.py --no-network
 
 ```text
 nextgen-ai-dia3/
-├── .gitignore                          # Excludes secrets, virtual environments, and local files
-├── README.md                           # Team identification, work distribution & reproduction guide
-├── prompts-en.md                       # Verbatim system messages and question prompt templates
-├── reference-td1.csv                   # Reference queries and values for questions C01-C20 (TD1 hand-in)
-├── model-question-comparison-en.csv    # Granular model-question comparison and traces pointers (TD1 hand-in)
-├── five-model-summary-en.csv           # Sourced index, dated prices, and family summaries (TD1 hand-in)
-├── reports/
+├── .gitignore                          # Excludes secrets (.env), virtual environments (.venv), and caches
+├── .gitattributes                     # Enforces LF endings across platforms for dataset hashing
+├── README.md                           # Team identification, architecture, work distribution & reproduction guide
+├── reports/                            # Session reports
 │   ├── td1.md                          # Session 1 report: model comparison & trace analysis
-│   ├── td2.md                          # Session 2 report: voting quorum & routing rule
-│   └── td3.md                          # Session 3 report: costing & architectural decision
-├── templates/                          # Templates and worksheets for subsequent sessions (TD2 & TD3)
-│   ├── configuration-comparison-en.csv # Architecture and trade-off comparison matrix (TD3)
-│   ├── cost-calculation-en.csv         # Token consumption and operational cost accounting (TD3)
-│   ├── contributions-en.csv            # Member responsibilities and contribution tracking
-│   ├── voting-tests-en.csv             # Consensus and quorum test suites (TD2)
-│   └── routing-rule-en.md              # Routing policy specifications (TD2)
-└── kit-td1/
-    ├── data/                           # Verified boutique.sqlite database and CSV tables
-    ├── schema.sql                      # Database relational schema (3 tables)
-    ├── questions-td1.json              # 20 reference revenue questions
-    ├── modeles-autorises.json          # Authorized model configurations and rate constraints
-    ├── skeleton-multi-llm-en.py        # Core orchestration engine
-    ├── sandbox_sqlite.py               # Read-only SQLite execution sandbox
-    ├── check_access.py                 # Provider and access validation script
-    ├── verify-data.py                  # Cryptographic SHA-256 data integrity check
-    ├── atelier-vote.py                 # Voting workshop module (TD2)
-    └── atelier-routage.py              # Routing workshop module (TD2)
+│   ├── td2.md                          # Session 2 report: voting quorum & routing rule (template)
+│   └── td3.md                          # Session 3 report: costing & architectural decision (template)
+├── td1/                                # Complete TD 1 workspace: scripts, data, traces & deliverables
+│   ├── data/                           # Verified boutique.sqlite database and CSV tables
+│   ├── check_access.py                 # Provider and access validation script
+│   ├── compute_references.py           # Automated calculation of the 20 reference queries
+│   ├── crosscheck-td1.py               # Independent cross-check computation
+│   ├── sandbox_sqlite.py               # Read-only SQLite execution sandbox
+│   ├── skeleton-multi-llm-en.py        # Core orchestration engine
+│   ├── verify-data.py                  # Cryptographic SHA-256 data integrity check
+│   ├── reference-td1.csv               # 20 reference queries & ground-truth values
+│   ├── traces-td1.csv                  # 104 consolidated LLM calls log
+│   ├── traces-td1.jsonl                # Raw JSONL execution traces with fingerprints
+│   ├── model-question-comparison-en.csv# 100-cell evaluation matrix & failure explanations
+│   ├── five-model-summary-en.csv       # 5-model public index, prices & family accuracy
+│   ├── traces-A.csv ... traces-E.csv   # Individual operator trace files
+│   ├── state-A.jsonl ... state-E.jsonl # Resumable operator state files
+│   ├── questions-td1.json              # 20 reference revenue questions
+│   ├── modeles-autorises.json          # Authorized model configurations
+│   ├── prompts-en.md                   # Verbatim system messages and question prompt templates
+│   ├── questions-td1-en.md             # Question specifications
+│   ├── schema.sql                      # Database relational schema (3 tables)
+│   └── report.md                       # TD 1 session report
+├── td2/                                # TD 2 preparation: voting consensus & dynamic routing
+│   ├── README.md                       # TD 2 overview and objectives
+│   ├── atelier-vote.py                 # Majority voting quorum consensus harness
+│   └── atelier-routage.py              # Dynamic question routing harness
+└── templates/                          # Templates and worksheets for subsequent sessions (TD2 & TD3)
+    ├── configuration-comparison-en.csv # Architecture and trade-off comparison matrix (TD3)
+    ├── cost-calculation-en.csv         # Token consumption and operational cost accounting (TD3)
+    ├── contributions-en.csv            # Member responsibilities and contribution tracking
+    ├── voting-tests-en.csv             # Consensus and quorum test suites (TD2)
+    └── routing-rule-en.md              # Routing policy specifications (TD2)
 ```

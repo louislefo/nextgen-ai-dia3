@@ -1,6 +1,6 @@
 provider,model_id,public_index,index_date,index_source,paid_route_same_model,input_usd_per_million,output_usd_per_million,price_date,price_source,access_used,period_results,age_results,product_results,combined_results,trace_files,limits
-groq,openai/gpt-oss-120b,,,,,,,,,,,,,,,
-groq,openai/gpt-oss-20b,,,,,,,,,,,,,,,
-openrouter,inclusionai/ling-3.0-flash-sante:free,,,,,,,,,,,,,,,
-groq,qwen/qwen3.8-27b,,,,,,,,,,,,,,,
-openrouter,dots-studio/dots-3-note-preview:free,,,,,,,,,,,,,,,
+groq,openai/gpt-oss-120b,11.6,2026-09-28,portefeuille-modeles-2026-09-28.csv,openai/gpt-oss-120b#openrouter,0.15,0.60,2026-09-28,OpenRouter pricing (portfolio group G4),groq (Free plan),6/6,5/5,4/4,5/5,"traces-A.csv, state-A.jsonl",Strict 1000 OTPM / TPM quota limits on Groq free tier; reasoning tokens included in output cap.
+groq,openai/gpt-oss-20b,9.0,2026-09-28,portefeuille-modeles-2026-09-28.csv,N/A (undocumented paid counterpart in portfolio),N/A,N/A,2026-09-28,N/A,groq (Free plan),6/6,3/5,4/4,5/5,"traces-B.csv, state-B.jsonl",Occasional age logic truncation; no documented paid API rate in corporate portfolio.
+openrouter,cohere/north-mini-code:free,N/A (recent replacement route),2026-10-14,Pedagogical announcement dated 14/10/2026,N/A (free community route on OpenRouter),0.00,0.00,2026-10-14,OpenRouter free marketplace (:free route),openrouter (:free tier),6/6,0/5,4/4,3/5,"traces-C.csv, state-C.jsonl",Severe age boundary calculation weaknesses (0/5 on pure age questions); free tier rate caps.
+groq,qwen/qwen3.8-27b,33.7,2026-09-28,portefeuille-modeles-2026-09-28.csv,N/A (undocumented exact 27b paid counterpart in portfolio),N/A,N/A,2026-09-28,N/A,groq (Free plan),5/6,3/5,4/4,1/5,"traces-D.csv, state-D.jsonl",Prone to HTTP 429 OTPM saturation (1000 tokens/min ceiling); 2 unexecuted cells.
+openrouter,dots-studio/dots-3-note-preview:free,N/A (free preview model),2026-10-14,OpenRouter model catalog,N/A (free community route on OpenRouter),0.00,0.00,2026-10-14,OpenRouter free marketplace (:free route),openrouter (:free tier),6/6,3/5,4/4,2/5,"traces-E.csv, state-E.jsonl",Hallucinates markdown code fences (```sql) causing 2 SQL rejections; age logic errors.

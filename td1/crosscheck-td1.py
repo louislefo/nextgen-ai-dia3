@@ -61,7 +61,8 @@ EXPECTED = {
 }
 
 ok = True
-for row in csv.DictReader(open(HERE.parent / "reference-td1.csv")):
+ref_file = HERE / "reference-td1.csv" if (HERE / "reference-td1.csv").exists() else HERE.parent / "reference-td1.csv"
+for row in csv.DictReader(open(ref_file)):
     cid, ref = row["case_id"], row["revenue_cents"]
     same = ref != "" and int(ref) == EXPECTED[cid]
     ok &= same
