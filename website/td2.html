@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="TD 2 Majority Voting Consensus and Dynamic Routing Architecture - ESILV DIA 3">
+  <title>TD 2: Quorum Consensus &amp; Dynamic Routing | ESILV DIA 3</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <div class="header-accent"></div>
+  <div class="header-top">
+    <div class="brand-wrapper">
+      <span class="brand-badge">ESILV DIA 3</span>
+      <div>
+        <div class="brand-title">Trustworthy Generative AI Engineering</div>
+        <div class="brand-subtitle">Next-Generation AI (Didier Parisot) · Pack 2026-10-14-students-1</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a href="https://github.com/louislefo/nextgen-ai-dia3" class="github-link" target="_blank" rel="noopener">
+        <span>GitHub Repository</span>
+      </a>
+    </div>
+  </div>
+  <nav class="header-nav" aria-label="Main Navigation">
+    <a href="index.html" class="nav-item">Overview</a>
+    <a href="td1.html" class="nav-item">TD 1: Model Benchmarking</a>
+    <a href="td2.html" class="nav-item active">TD 2: Consensus &amp; Routing</a>
+    <a href="td3.html" class="nav-item">TD 3: Cost &amp; Trade-offs</a>
+  </nav>
+</header>
+
+<main>
+  <div class="meta-bar">
+    <span>Module: TD 2 Architecture</span>
+    <span>Consensus: k-of-n Quorum</span>
+    <span>Routing: Difficulty-Aware Dispatch</span>
+    <span>Status: In Preparation</span>
+  </div>
+
+  <h1>TD 2: Majority Voting Consensus &amp; Dynamic Routing</h1>
+  <p class="lead">
+    Designing robust decision mechanisms for production AI systems: combining multi-model voting quorums for critical queries with dynamic rule-based model routing to minimize operational costs.
+  </p>
+
+  <aside class="notice final">
+    <p><strong>Building on TD 1 Empirical Findings</strong></p>
+    <p>TD 1 revealed that lightweight models achieve near-perfect accuracy (96.7% to 100%) on timestamp and product filters, but drop to 60.0% on completed age arithmetic. TD 2 exploits this gap to build an automated, cost-optimal system.</p>
+  </aside>
+
+  <h2>1. Pillar 1: Majority Voting Consensus (<em>k</em>-of-<em>n</em> Quorum)</h2>
+  <p>
+    When a database query carries operational or financial consequences, trusting a single probabilistic model draw is unacceptable. The voting consensus mechanism operates as follows:
+  </p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="pill">Mechanism</div>
+      <h3 class="card-title">Parallel Panel Querying</h3>
+      <p>A query is simultaneously dispatched to <em>n</em> distinct models (e.g., <em>n</em> = 3 or 5). To ensure true independence, the panel must not reuse duplicate backend providers or shared model families.</p>
+    </div>
+    <div class="card">
+      <div class="pill">Verification</div>
+      <h3 class="card-title">Sandboxed Execution &amp; Value Matching</h3>
+      <p>Model SQL queries are executed independently in the SQLite read-only sandbox. Votes are cast on the <em>computed numerical revenue</em> (<code>revenue_cents</code>), not on verbatim SQL string similarity.</p>
+    </div>
+    <div class="card">
+      <div class="pill">Safety Guardrail</div>
+      <h3 class="card-title">Quorum Threshold &amp; Abstention</h3>
+      <p>If at least <em>k</em> models agree on the identical value (e.g., 2 out of 3, or 3 out of 5), that value is accepted. Otherwise, the system safely <strong>abstains</strong> rather than outputting a hallucinated figure.</p>
+    </div>
+  </div>
+
+  <h2>2. Pillar 2: Dynamic Difficulty Routing</h2>
+  <p>
+    Instead of sending all questions to expensive frontier models, a pre-inference rule inspects request complexity and selects the cheapest model capable of reliable answering:
+  </p>
+
+  <div class="tableau">
+    <table>
+      <thead>
+        <tr>
+          <th>Query Complexity Tier</th>
+          <th>Question Characteristics</th>
+          <th>Routing Decision</th>
+          <th>Economic Rationale</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Tier 1: Simple Period / Product</strong></td>
+          <td>Orders between dates, product categories (C01, C03, C04, C05, C07, C12, C13, C20).</td>
+          <td>Route to <strong>Tier 1 Compact Model</strong> (e.g., GPT-OSS 20B or Dots).</td>
+          <td>Near 100% accuracy at zero / minimal token cost.</td>
+        </tr>
+        <tr>
+          <td><strong>Tier 2: Complex Boundary / Age</strong></td>
+          <td>Exact completed age at order time or reference date (C02, C08-C11, C15-C19).</td>
+          <td>Route to <strong>Frontier Model</strong> (GPT-120B) OR <strong>3-Model Voting Panel</strong>.</td>
+          <td>Prevents severe calendar date miscalculations identified in TD 1.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>3. TD 2 Workshop Modules</h2>
+  <div class="cards">
+    <div class="card">
+      <h3 class="card-title"><code>atelier-vote.py</code></h3>
+      <p>Harness for testing the quorum voting algorithm across four key operational edge cases:</p>
+      <ul>
+        <li><strong>Consensus agreement:</strong> Models return matching values; quorum met.</li>
+        <li><strong>Consensus disagreement:</strong> Models diverge; verified safe abstention.</li>
+        <li><strong>Provider outage (HTTP 429/timeout):</strong> Graceful quorum degradation.</li>
+        <li><strong>Duplicate routes:</strong> Detecting and rejecting false consensus from duplicate models.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title"><code>atelier-routage.py</code></h3>
+      <p>Benchmarking harness evaluating the routing rule against seven distinct real-world traffic scenarios, balancing accuracy against total API expenditure.</p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>ESILV - Data &amp; Artificial Intelligence Major (Year 4 / S7) · Course: Next-Generation AI (Didier Parisot)</p>
+  <p>Engineering repository for Trustworthy Generative AI · Pack Version <code>2026-10-14-students-1</code></p>
+</footer>
+
+</body>
+</html>

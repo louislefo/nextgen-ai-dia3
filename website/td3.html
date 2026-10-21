@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="TD 3 Cost-Performance Optimization, Configuration Selection and Live Demonstration - ESILV DIA 3">
+  <title>TD 3: Cost &amp; Trade-offs | ESILV DIA 3</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <div class="header-accent"></div>
+  <div class="header-top">
+    <div class="brand-wrapper">
+      <span class="brand-badge">ESILV DIA 3</span>
+      <div>
+        <div class="brand-title">Trustworthy Generative AI Engineering</div>
+        <div class="brand-subtitle">Next-Generation AI (Didier Parisot) · Pack 2026-10-14-students-1</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a href="https://github.com/louislefo/nextgen-ai-dia3" class="github-link" target="_blank" rel="noopener">
+        <span>GitHub Repository</span>
+      </a>
+    </div>
+  </div>
+  <nav class="header-nav" aria-label="Main Navigation">
+    <a href="index.html" class="nav-item">Overview</a>
+    <a href="td1.html" class="nav-item">TD 1: Model Benchmarking</a>
+    <a href="td2.html" class="nav-item">TD 2: Consensus &amp; Routing</a>
+    <a href="td3.html" class="nav-item active">TD 3: Cost &amp; Trade-offs</a>
+  </nav>
+</header>
+
+<main>
+  <div class="meta-bar">
+    <span>Module: TD 3 Economics</span>
+    <span>Focus: Token Cost Modeling &amp; Trade-offs</span>
+    <span>Status: Upcoming</span>
+  </div>
+
+  <h1>TD 3: Cost-Performance Optimization &amp; Live Demonstration</h1>
+  <p class="lead">
+    Synthesizing accuracy, latency, and token economics into an optimal production architecture: evaluating the trade-off between the cost of verification and the business cost of an unchecked model error.
+  </p>
+
+  <h2>1. The Economic Trade-off: Cost of Verification vs. Cost of Error</h2>
+  <div class="cards">
+    <div class="card">
+      <div class="pill">Direct Cost</div>
+      <h3 class="card-title">Token Expenditure</h3>
+      <p>Sending a prompt with full relational schema and reasoning instructions consumes between 400 and 1,200 tokens per call. At high volume, multi-model panels multiply token consumption by the panel size <em>n</em>.</p>
+    </div>
+    <div class="card">
+      <div class="pill">Risk-Weighted Cost</div>
+      <h3 class="card-title">Business Cost of an Error</h3>
+      <p>An erroneous revenue figure in an ERP or accounting system can result in tax penalties, misplaced inventory orders, or flawed financial disclosures. Investing in verification is insurance against bad model draws.</p>
+    </div>
+  </div>
+
+  <h2>2. Production Configuration Comparison</h2>
+  <div class="tableau">
+    <table>
+      <thead>
+        <tr>
+          <th>Configuration</th>
+          <th>Architecture Description</th>
+          <th>Reliability (Accuracy)</th>
+          <th>Relative Cost</th>
+          <th>Best Suited For</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Config 1: Single Compact</strong></td>
+          <td>Direct dispatch to lightweight model (e.g. GPT-20B).</td>
+          <td>Medium (~75-90%)</td>
+          <td>Lowest ($)</td>
+          <td>Internal dashboards, low-stakes data exploration.</td>
+        </tr>
+        <tr>
+          <td><strong>Config 2: Single Frontier</strong></td>
+          <td>Direct dispatch to flagship model (e.g. GPT-120B).</td>
+          <td>High (~100%)</td>
+          <td>Moderate ($$$)</td>
+          <td>Ad-hoc analyst queries where reasoning depth is needed.</td>
+        </tr>
+        <tr>
+          <td><strong>Config 3: Routed Hybrid</strong></td>
+          <td>Dynamic rule routing easy queries to compact and hard to frontier.</td>
+          <td>Very High (~98%)</td>
+          <td>Optimal ($$)</td>
+          <td>Production workloads with predictable request patterns.</td>
+        </tr>
+        <tr>
+          <td><strong>Config 4: Full Quorum Panel</strong></td>
+          <td>3-of-5 heterogeneous voting panel with automated abstention.</td>
+          <td>Near 100% (Guaranteed)</td>
+          <td>Highest ($$$$)</td>
+          <td>Audited financial reporting, compliance, and automated billing.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>3. Live Demonstration Specifications</h2>
+  <p>The TD 3 final deliverable includes a recorded, verifiable walkthrough demonstrating:</p>
+  <ul>
+    <li>The raw natural language prompt submitted by the operator.</li>
+    <li>The SQL generated across participating models with prompt fingerprints.</li>
+    <li>Sandboxed execution on <code>boutique.sqlite</code> with zero side-effects.</li>
+    <li>The quorum evaluation verdict and final consensus decision.</li>
+  </ul>
+</main>
+
+<footer>
+  <p>ESILV - Data &amp; Artificial Intelligence Major (Year 4 / S7) · Course: Next-Generation AI (Didier Parisot)</p>
+  <p>Engineering repository for Trustworthy Generative AI · Pack Version <code>2026-10-14-students-1</code></p>
+</footer>
+
+</body>
+</html>
