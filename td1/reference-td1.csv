@@ -1,21 +1,21 @@
 case_id,sql,revenue_cents
-C01,,
-C02,,
-C03,,
-C04,,
-C05,,
-C06,,
-C07,,
-C08,,
-C09,,
-C10,,
-C11,,
-C12,,
-C13,,
-C14,,
-C15,,
-C16,,
-C17,,
-C18,,
-C19,,
-C20,,
+C01,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id WHERE o.date >= '2026-03-01 00:00:00' AND o.date < '2026-06-01 00:00:00';",792800
+C02,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id JOIN customers c ON o.customer_id = c.customer_id WHERE date(c.birth_date, '+25 years') <= '2026-09-25' AND date(c.birth_date, '+26 years') > '2026-09-25';",590320
+C03,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id WHERE p.product_id IN ('a', 'b', 'c') AND o.date >= '2026-01-01 00:00:00' AND o.date < '2026-07-01 00:00:00';",936350
+C04,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id WHERE o.date >= '2026-01-01 00:00:00' AND o.date < '2026-10-01 00:00:00';",2826250
+C05,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id WHERE o.date >= '2026-06-01 00:00:00' AND o.date < '2026-06-02 00:00:00';",38480
+C06,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id WHERE o.date >= '2025-01-01 00:00:00' AND o.date < '2026-01-01 00:00:00';",0
+C07,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id WHERE o.date >= '2026-05-31 00:00:00' AND o.date < '2026-06-01 00:00:00';",13970
+C08,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id JOIN customers c ON o.customer_id = c.customer_id WHERE date(c.birth_date, '+25 years') <= '2026-09-24' AND date(c.birth_date, '+26 years') > '2026-09-24';",605580
+C09,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id JOIN customers c ON o.customer_id = c.customer_id WHERE date(c.birth_date, '+25 years') <= '2026-09-26' AND date(c.birth_date, '+26 years') > '2026-09-26';",487980
+C10,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id JOIN customers c ON o.customer_id = c.customer_id WHERE date(c.birth_date, '+25 years') <= date(o.date) AND date(c.birth_date, '+26 years') > date(o.date);",558980
+C11,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id JOIN customers c ON o.customer_id = c.customer_id WHERE date(c.birth_date, '+25 years') <= '2026-12-01' AND date(c.birth_date, '+26 years') > '2026-12-01';",446690
+C12,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id WHERE p.product_id IN ('a', 'b', 'c');",1666490
+C13,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id WHERE p.product_id IN ('a', 'c') AND o.date >= '2026-04-01 00:00:00' AND o.date < '2026-05-01 00:00:00';",107740
+C14,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id WHERE p.product_id IN ('a', 'b', 'c') AND o.date >= '2026-10-01 00:00:00' AND o.date < '2026-12-01 00:00:00';",0
+C15,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id JOIN customers c ON o.customer_id = c.customer_id WHERE o.date >= '2026-03-01 00:00:00' AND o.date < '2026-06-01 00:00:00' AND date(c.birth_date, '+25 years') <= '2026-09-25' AND date(c.birth_date, '+26 years') > '2026-09-25';",168680
+C16,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id JOIN customers c ON o.customer_id = c.customer_id WHERE p.product_id IN ('a', 'b', 'c') AND date(c.birth_date, '+25 years') <= '2026-09-25' AND date(c.birth_date, '+26 years') > '2026-09-25';",376740
+C17,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id JOIN customers c ON o.customer_id = c.customer_id WHERE p.product_id IN ('a', 'b', 'c') AND o.date >= '2026-01-01 00:00:00' AND o.date < '2026-07-01 00:00:00' AND date(c.birth_date, '+25 years') <= '2026-09-25' AND date(c.birth_date, '+26 years') > '2026-09-25';",258180
+C18,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id JOIN customers c ON o.customer_id = c.customer_id WHERE o.date >= '2026-05-01 00:00:00' AND o.date < '2026-06-01 00:00:00' AND date(c.birth_date, '+25 years') <= date(o.date) AND date(c.birth_date, '+26 years') > date(o.date);",62480
+C19,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id JOIN customers c ON o.customer_id = c.customer_id WHERE p.product_id = 'd' AND o.date >= '2026-09-01 00:00:00' AND o.date < '2026-10-01 00:00:00' AND date(c.birth_date, '+25 years') <= '2026-09-25' AND date(c.birth_date, '+26 years') > '2026-09-25';",1990
+C20,"SELECT COALESCE(SUM(o.quantity_product * p.price), 0) AS revenue_cents FROM orders o JOIN product p ON o.product_id = p.product_id WHERE o.date >= '2026-06-01 00:00:00' AND o.date < '2026-09-01 00:00:00';",1106090
