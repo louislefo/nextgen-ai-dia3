@@ -16,5 +16,7 @@ TD 2 focuses on two core architectures for trustworthy generative AI:
 
 ## Files in this Directory
 
+- `PLAN.md`: Comprehensive operational plan, team role allocation, schedule, and task breakdown.
+- `skeleton-multi-llm-en.py`: Multi-model orchestration skeleton containing `Orchestrateur.vote_k_sur_n`.
 - `atelier-vote.py`: Simulation and evaluation harness for $k$-of-$n$ consensus voting mechanisms.
 - `atelier-routage.py`: Benchmarking harness for dynamic model routing strategies across different difficulty scenarios.
