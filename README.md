@@ -67,6 +67,8 @@ nextgen-ai-dia3/
 │   ├── skeleton-multi-llm-en.py        # Orchestration client containing vote_k_sur_n
 │   ├── atelier-vote.py                 # Quorum voting test and benchmark harness
 │   ├── atelier-routage.py              # Dynamic model routing and resource simulator
+│   ├── pair-b/                         # Step 2: false consensus diagnosis & delta SQL evidence
+│   ├── qa/verify-td2.py                # Offline verification harness: 12 checks, exit 1 on failure
 │   ├── data/                           # Local copy of the verified SQLite database
 │   ├── reference-td1.csv               # Ground-truth reference values in cents
 │   └── traces-td1.csv                  # TD 1 master inference trace log
@@ -77,7 +79,8 @@ nextgen-ai-dia3/
 │   ├── crosscheck-01.md ... 03.md      # TD 1 SQL reference cross-checks (6 reviews)
 │   ├── crosscheck-04.md                # TD 1 multi-model trace & pacing audits (2 reviews)
 │   ├── crosscheck-05.md                # TD 2 voting quorum engine audits (2 reviews)
-│   └── crosscheck-06.md                # TD 2 false consensus & routing audits (2 reviews)
+│   ├── crosscheck-06.md                # TD 2 false consensus & routing audits (2 reviews)
+│   └── crosscheck-07.md                # TD 2 automated verification pass (12 scripted checks)
 ├── website/                            # GitHub Pages live interactive portal
 │   ├── css/style.css                   # Custom responsive stylesheet
 │   ├── index.html                      # Executive project dashboard & team presentation
