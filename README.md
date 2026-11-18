@@ -69,7 +69,7 @@ nextgen-ai-dia3/
 │   ├── atelier-routage.py              # Dynamic model routing and resource simulator
 │   ├── pair-b/                         # Step 2: false consensus diagnosis & delta SQL evidence
 │   ├── pair-c/                         # Step 3: routing rule per family & simulator before/after
-│   ├── qa/verify-td2.py                # Offline verification harness: 14 checks, exit 1 on failure
+│   ├── qa/verify-td2.py                # Offline verification harness: 15 checks, exit 1 on failure
 │   ├── data/                           # Local copy of the verified SQLite database
 │   ├── reference-td1.csv               # Ground-truth reference values in cents
 │   └── traces-td1.csv                  # TD 1 master inference trace log
@@ -81,7 +81,7 @@ nextgen-ai-dia3/
 │   ├── crosscheck-04.md                # TD 1 multi-model trace & pacing audits (2 reviews)
 │   ├── crosscheck-05.md                # TD 2 voting quorum engine audits (2 reviews)
 │   ├── crosscheck-06.md                # TD 2 false consensus & routing audits (2 reviews)
-│   └── crosscheck-07.md                # TD 2 automated verification pass (14 scripted checks)
+│   └── crosscheck-07.md                # TD 2 automated verification pass (15 scripted checks)
 ├── website/                            # GitHub Pages live interactive portal
 │   ├── css/style.css                   # Custom responsive stylesheet
 │   ├── index.html                      # Executive project dashboard & team presentation

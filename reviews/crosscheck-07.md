@@ -41,7 +41,7 @@ perturbed copy of the repository. One wrong cell in Pair C's table, one wrong ce
 `reference-td1.csv`, one altered date in a recorded query, one renamed routing action:
 each perturbation is caught by the expected check and only by it.
 
-## 2. Result of the 14 checks
+## 2. Result of the 15 checks
 
 | Check | Result | Evidence |
 |---|---|---|
@@ -54,13 +54,14 @@ each perturbation is caught by the expected check and only by it.
 | `shared_wrong_values` | **PASS** | exactly C02 (0), C09 (0), C10 (119410), with the model pairs stated in `reports/td2.md` |
 | `quorum_2of3` | **PASS** | 17/20 consensus, 1 wrong (C09 = 0), abstentions C10, C17, C19 |
 | `quorum_3of5` | **PASS** | 17/20 consensus, 0 wrong, abstentions C09, C10, C17 |
-| `pair_a_vote` | **FAIL** | `Orchestrateur.vote_k_sur_n` raises `NotImplementedError` (finding F1) |
+| `pair_a_vote` | **FAIL** | `Orchestrateur.vote_k_sur_n` raises `NotImplementedError` (finding F1; green on the step 1 branch of PR #16) |
+| `skeleton_sync` | **PASS** | the `td1` and `td2` copies of `vote_k_sur_n` are the same code; only the `td2` copy is exercised by `atelier-vote.py`, so divergence must fail the pass |
 | `sql_evidence` | **PASS** | the 6 statements of `td2/pair-b/step2-wrong-consensus.sql` re-executed: 487980 / 0 / 0 / delta 6 rows = 487980 / 487980 / delta 28 rows = 439570 |
 | `sql_verbatim` | **PASS** | the two faulty `WHERE` clauses quoted by Pair B are identical to `traces-td1.csv` after comment and whitespace normalisation |
 | `pair_c_rates` | **PASS** | the 8 x 5 rate table of step 3 section 4.1, parsed from the report, matches the traces cell for cell; families match the `type` field of `questions-td1.json` |
 | `pair_c_simulator` | **PASS** | `python3 atelier-routage.py` reproduces the 11 captured decisions of `simulator-after.jsonl` exactly |
 
-**13 of 14 checks pass.** Pair B's and Pair C's sections of `reports/td2.md` are fully
+**14 of 15 checks pass.** Pair B's and Pair C's sections of `reports/td2.md` are fully
 reproducible. The single failure and the findings below concern step 1 and the three
 earlier cross-check logs.
 
@@ -91,6 +92,14 @@ verdict APPROVED. No code in the repository can produce that output at commit `a
 Step 1 of the TD 2 statement is therefore not delivered. Pair A owns the fix; the harness
 check `pair_a_vote` turns green on its own once the method is implemented, and will also
 report any disagreement with the oracle on the 40 decisions.
+
+**Status: resolved in PR #16.** Pair A delivered the engine during the session. Audited on
+that branch merged with `main`, `pair_a_vote` passes: the contract holds on all three
+failure modes and the 40 decisions agree with the oracle. Their 20-question matrix is
+correct cell for cell, including the 16-versus-17 correct consensus split and the single
+false consensus on C09. The detailed review is on PR #16. What remains of F1 is the
+record: `crosscheck-05.md` carried an APPROVED verdict for several hours before the code
+existed.
 
 ### F2 - Major: the quorum figures of crosscheck-05 Review 2 are not those of the traces
 
@@ -188,7 +197,7 @@ the boundary argument on C003 airtight.
   traces contradict. Submitting them as they stand undercuts every audit in this
   directory, the correct ones included.
 
-Re-audit by rerunning `python3 td2/qa/verify-td2.py`. The pass is green only when all 14
+Re-audit by rerunning `python3 td2/qa/verify-td2.py`. The pass is green only when all 15
 checks are green.
 
 ## 5. Quorum matrix produced by the pass

@@ -10,6 +10,7 @@ read-only through sandbox_sqlite. Exit code 1 if any check fails.
 from __future__ import annotations
 
 import argparse
+import ast
 import collections
 import csv
 import hashlib
@@ -29,6 +30,7 @@ TRACES = TD2 / "traces-td1.csv"
 REFERENCE = TD2 / "reference-td1.csv"
 QUESTIONS = TD2 / "questions-td1.json"
 SKELETON = TD2 / "skeleton-multi-llm-en.py"
+SKELETON_TD1 = TD2.parent / "td1" / "skeleton-multi-llm-en.py"
 ROUTER = TD2 / "atelier-routage.py"
 PAIR_B_SQL = TD2 / "pair-b" / "step2-wrong-consensus.sql"
 PAIR_C_AFTER = TD2 / "pair-c" / "simulator-after.jsonl"
@@ -434,6 +436,30 @@ def check_pair_c_simulator(report):
                else f"{len(produced)} produced vs {len(captured)} captured, drift on {drift}")
 
 
+def check_skeleton_sync(report):
+    """The vote lives in two skeletons but only the td2 copy is exercised by atelier-vote.py."""
+    def vote_source(path):
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            if isinstance(node, ast.FunctionDef) and node.name == "vote_k_sur_n":
+                return ast.unparse(node)
+        return None
+
+    try:
+        in_td2, in_td1 = vote_source(SKELETON), vote_source(SKELETON_TD1)
+    except (OSError, SyntaxError) as error:
+        report.add("skeleton_sync", False, f"{type(error).__name__}: {error}")
+        return
+    if in_td2 is None or in_td1 is None:
+        missing = [str(path) for path, source in ((SKELETON, in_td2), (SKELETON_TD1, in_td1))
+                   if source is None]
+        report.add("skeleton_sync", False, f"vote_k_sur_n not found in {missing}")
+        return
+    report.add("skeleton_sync", in_td2 == in_td1,
+               "the td1 and td2 copies of vote_k_sur_n are the same code" if in_td2 == in_td1
+               else "the td1 and td2 copies of vote_k_sur_n have diverged; "
+                    "atelier-vote.py only exercises the td2 one")
+
+
 def check_sql_evidence(report, sandbox):
     """Re-run Pair B's delta SQL and compare every figure quoted in the report."""
     statements = sql_statements(PAIR_B_SQL)
@@ -522,6 +548,7 @@ def main():
     matrix = quorum_matrix(cells)
     check_quorum_matrix(report, matrix)
     check_pair_a_vote(report, cells, matrix)
+    check_skeleton_sync(report)
     check_sql_evidence(report, sandbox)
     check_sql_verbatim(report, cells)
     check_pair_c_rates(report, cells)
