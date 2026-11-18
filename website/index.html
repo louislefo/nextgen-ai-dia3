@@ -16,7 +16,7 @@
       <span class="brand-badge">ESILV DIA 3</span>
       <div>
         <div class="brand-title">Trustworthy Generative AI Engineering</div>
-        <div class="brand-subtitle">Next-Generation AI (Didier Parisot) · Pack 2026-10-14-students-1</div>
+        <div class="brand-subtitle">Next-Generation AI (Didier Parisot) · Pack 2026-11-18-students-5</div>
       </div>
     </div>
     <div class="header-actions">
@@ -38,7 +38,7 @@
     <span>Course: Next-Generation AI (S7)</span>
     <span>Sub-group: DIA 3 (Group 2)</span>
     <span>Seed: 20260925</span>
-    <span>Pack Version: 2026-10-14-students-1</span>
+    <span>Pack Version: 2026-11-18-students-5</span>
   </div>
 
   <h1>Trustworthy Generative AI Engineering</h1>
@@ -58,20 +58,20 @@
       <div class="stat-sub">100 base + 4 retries</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value">5</div>
-      <div class="stat-label">Evaluated Models</div>
-      <div class="stat-sub">Groq &amp; OpenRouter</div>
+      <div class="stat-value">16 / 16</div>
+      <div class="stat-label">QA Harness Checks</div>
+      <div class="stat-sub">100% PASS on verify-td2.py</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value">7</div>
-      <div class="stat-label">Team Members</div>
-      <div class="stat-sub">Distributed execution</div>
+      <div class="stat-value">100%</div>
+      <div class="stat-label">Quorum Precision (3-of-5)</div>
+      <div class="stat-sub">0.0% false consensus</div>
     </div>
   </div>
 
   <aside class="notice final">
-    <p><strong>TD 1 Completed &amp; Verified</strong></p>
-    <p>All 20 ground-truth SQL references were computed on <code>data/boutique.sqlite</code> and validated against the instructor answer key. The 100-cell multi-model evaluation matrix is fully logged and analyzed with granular failure classifications.</p>
+    <p><strong>TD 1 &amp; TD 2 Completed &amp; Verified (16/16 PASS)</strong></p>
+    <p>All 20 ground-truth SQL references and the 100-cell multi-model matrix from TD 1 are certified. TD 2 delivers the complete <code>vote_k_sur_n</code> quorum voting engine, the resolution and SQL delta reconciliation of the shared false consensus C09 (487,980 cents), the 8x5 empirical routing policy, and the 11-scenario simulator. Every deliverable passes all 16 automated offline QA checks.</p>
   </aside>
 
   <h2>The Core Problem: Confidence vs. Factual Correctness</h2>
@@ -99,15 +99,15 @@
 
     <div class="card">
       <div class="pill">Completed</div>
-      <h3 class="card-title"><a href="td2.html">TD 2: Quorum Consensus &amp; Routing Rules</a></h3>
-      <p><code>vote_k_sur_n</code> majority voting and a routing policy derived from measured per-family accuracy, run entirely offline on the TD 1 traces.</p>
+      <h3 class="card-title"><a href="td2.html">TD 2: Quorum Consensus &amp; Dynamic Routing</a></h3>
+      <p>Implementation of <code>vote_k_sur_n</code> majority voting consensus, empirical false consensus resolution, and dynamic model routing.</p>
       <ul>
-        <li>Both quorums reach consensus on 17/20 questions; the 2-of-3 panel published one wrong figure, on C09</li>
-        <li>Wrong consensus proven in SQL: two unrelated bugs converge on <code>0</code>, gap reconciled to the cent</li>
-        <li>Routing policy on an 8&times;5 empirical rate table, 11 simulated scenarios in <code>atelier-routage.py</code></li>
-        <li>16/16 offline verification checks passing in <code>td2/qa/verify-td2.py</code></li>
+        <li>Implemented <code>vote_k_sur_n</code> with strict majority threshold and fail-safe abstention</li>
+        <li>Identified &amp; resolved C09 false consensus (487,980 cts gap reconciled across 6 customers in SQLite)</li>
+        <li>Derived 8x5 empirical accuracy rate matrix &amp; 1-page routing rule with 11 simulation scenarios</li>
+        <li>Certified by 16/16 offline verification checks in <code>verify-td2.py</code> and 7 peer review logs</li>
       </ul>
-      <p><a href="td2.html">Explore TD 2 Results &rarr;</a></p>
+      <p><a href="td2.html">Explore TD 2 Architecture &amp; Benchmark &rarr;</a></p>
     </div>
 
     <div class="card">
@@ -115,8 +115,8 @@
       <h3 class="card-title"><a href="td3.html">TD 3: Cost-Performance Trade-offs &amp; Demonstration</a></h3>
       <p>Economic modeling of production configurations, risk-weighted error costs, and live demonstration of trustworthy querying.</p>
       <ul>
-        <li>Cost worksheet with dated, sourced token pricing</li>
-        <li>Error cost estimation across e-commerce operational workflows</li>
+        <li>Cost worksheet with dated, sourced token pricing from portfolio export</li>
+        <li>Error cost estimation across e-commerce operational workflows (internal vs customer vs payout)</li>
         <li>Recorded demonstration of SQL generation, sandboxed execution, and quorum decision</li>
       </ul>
       <p><a href="td3.html">Explore TD 3 Framework &rarr;</a></p>
@@ -124,43 +124,43 @@
   </div>
 
   <h2>Sub-group Team &amp; Workload Partitioning</h2>
-  <p>To avoid provider rate limits (HTTP 429) and maintain strict reproducibility, workload is distributed across seven team members:</p>
+  <p>Workload is organized into specialized engineering pairs and cross-validated across all seven members:</p>
 
   <div class="team-grid">
     <div class="member-card">
       <div class="member-name">Louis Le Forestier</div>
       <div class="member-email">louis.le_forestier@edu.devinci.fr</div>
-      <div class="member-role">Operator A (<code>gpt-oss-120b</code>, 20/20), Reference C01-C03, trace merger &amp; comparison synthesis.</div>
+      <div class="member-role"><strong>Pair A (Lead):</strong> Quorum voting engine architecture (<code>vote_k_sur_n</code>), synthetic test suite, 20-question matrix generation; TD 1 Operator A (<code>gpt-oss-120b</code>, 20/20).</div>
     </div>
     <div class="member-card">
       <div class="member-name">Maxime Laurent</div>
       <div class="member-email">maxime.laurent@edu.devinci.fr</div>
-      <div class="member-role">Operator B (<code>gpt-oss-20b</code>, 18/20), Reference C04-C06, comparison matrix authoring.</div>
+      <div class="member-role"><strong>Pair A (Co-Lead):</strong> Quorum benchmarking (2-of-3 vs 3-of-5), transition analysis (C09 suppression &amp; C19 recovery); TD 1 Operator B (<code>gpt-oss-20b</code>, 18/20).</div>
     </div>
     <div class="member-card">
       <div class="member-name">Baptiste Noailhac</div>
       <div class="member-email">baptiste.noailhac@edu.devinci.fr</div>
-      <div class="member-role">Operator C (<code>cohere/north-mini-code</code>, 13/20), Reference C07-C09, five-model summary &amp; pricing.</div>
+      <div class="member-role"><strong>Group B:</strong> 100-cell trace audit for shared wrong values, C09 false consensus isolation, manual vote verification; TD 1 Operator C (<code>cohere/north-mini-code</code>, 13/20).</div>
     </div>
     <div class="member-card">
       <div class="member-name">Jean Jaunet</div>
       <div class="member-email">jean.jaunet@edu.devinci.fr</div>
-      <div class="member-role">Operator D (<code>qwen3.8-27b</code>, 13/20), Reference C10-C13, model summary &amp; cross-checks.</div>
+      <div class="member-role"><strong>Group B:</strong> Root-cause SQL diagnostic queries, delta SQL execution on <code>boutique.sqlite</code> (487,980 cts reconciliation); TD 1 Operator D (<code>qwen3.8-27b</code>, 13/20).</div>
     </div>
     <div class="member-card">
       <div class="member-name">Alexandre Jullien Gaildraud</div>
       <div class="member-email">alexandre.jullien_gaildraud@edu.devinci.fr</div>
-      <div class="member-role">Operator E (<code>dots-3-note-preview</code>, 15/20), Reference C14-C17, session report &amp; taxonomy.</div>
+      <div class="member-role"><strong>Pair C:</strong> 8x5 empirical accuracy rate matrix by family, 1-page dynamic routing policy and tiered verification rules; TD 1 Operator E (<code>dots-3-note-preview</code>, 15/20).</div>
     </div>
     <div class="member-card">
       <div class="member-name">Valentin Gourmelon</div>
       <div class="member-email">valentin.gourmelon@edu.devinci.fr</div>
-      <div class="member-role">Master Coordinator &amp; Auditor, Reference C18-C20, sequential call supervisor &amp; trace auditor.</div>
+      <div class="member-role"><strong>Pair C:</strong> Simulator adaptation (<code>atelier-routage.py</code>), portfolio resource pricing, queue priority analysis; TD 1 Master Coordinator.</div>
     </div>
     <div class="member-card">
       <div class="member-name">Romain Thepaut</div>
       <div class="member-email">romain.thepaut@edu.devinci.fr</div>
-      <div class="member-role">Quality Assurance &amp; Secondary Review, deliverable formatting, schema verification &amp; proofreading.</div>
+      <div class="member-role"><strong>Group B &amp; QA Lead:</strong> Automated verification test harness (<code>td2/qa/verify-td2.py</code>, 15/15 checks pass), comprehensive audit pass (<code>crosscheck-07.md</code>).</div>
     </div>
   </div>
 
@@ -186,14 +186,19 @@
           <td>Authorizer blocks all non-SELECT queries, table mutations, PRAGMA calls, and attached databases.</td>
         </tr>
         <tr>
-          <td><strong>Inference Engine</strong></td>
-          <td><code>skeleton-multi-llm-en.py</code></td>
-          <td>Common prompt fingerprint per question, temperature 0, 45-second timeout, maximum 1 retry.</td>
+          <td><strong>Consensus Engine</strong></td>
+          <td><code>skeleton-multi-llm-en.py</code> (<code>vote_k_sur_n</code>)</td>
+          <td>Strict majority enforcement (<em>k</em> &gt; <em>n</em>//2), duplicate route detection, error retention in <em>n</em>, no value invention.</td>
+        </tr>
+        <tr>
+          <td><strong>Dynamic Router</strong></td>
+          <td><code>atelier-routage.py</code></td>
+          <td>Empirical dispatch based on TD 1 family accuracy, risk-tiered verification, queue deferral rules.</td>
         </tr>
         <tr>
           <td><strong>Audit &amp; Persistence</strong></td>
-          <td><code>traces-td1.csv</code> &amp; <code>.jsonl</code></td>
-          <td>Every call preserved with HTTP status, latency, token consumption, SQL query, and sandboxed output.</td>
+          <td><code>traces-td1.csv</code> &amp; <code>reviews/</code></td>
+          <td>Every call logged with latency, tokens, query, and verdict; 7 formal cross-check logs certifying all deliverables.</td>
         </tr>
       </tbody>
     </table>
@@ -202,7 +207,7 @@
 
 <footer>
   <p>ESILV - Data &amp; Artificial Intelligence Major (Year 4 / S7) · Course: Next-Generation AI (Didier Parisot)</p>
-  <p>Engineering repository for Trustworthy Generative AI · Pack Version <code>2026-10-14-students-1</code></p>
+  <p>Engineering repository for Trustworthy Generative AI · Pack Version <code>2026-11-18-students-5</code></p>
 </footer>
 
 </body>
