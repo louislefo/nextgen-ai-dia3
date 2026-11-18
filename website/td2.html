@@ -16,7 +16,7 @@
       <span class="brand-badge">ESILV DIA 3</span>
       <div>
         <div class="brand-title">Trustworthy Generative AI Engineering</div>
-        <div class="brand-subtitle">Next-Generation AI (Didier Parisot) · Pack 2026-10-14-students-1</div>
+        <div class="brand-subtitle">Next-Generation AI (Didier Parisot) · Pack 2026-11-18-students-5</div>
       </div>
     </div>
     <div class="header-actions">
@@ -36,99 +36,714 @@
 <main>
   <div class="meta-bar">
     <span>Module: TD 2 Architecture</span>
-    <span>Consensus: k-of-n Quorum</span>
-    <span>Routing: Difficulty-Aware Dispatch</span>
-    <span>Status: In Preparation</span>
+    <span>Consensus: Strict Majority k-of-n</span>
+    <span>Routing: Empirical 8x5 Table</span>
+    <span>Status: Completed &amp; Verified (15/15 PASS)</span>
   </div>
 
-  <h1>TD 2: Majority Voting Consensus &amp; Dynamic Routing</h1>
+  <h1>TD 2: Majority Quorum Consensus &amp; Dynamic Model Routing</h1>
   <p class="lead">
-    Designing robust decision mechanisms for production AI systems: combining multi-model voting quorums for critical queries with dynamic rule-based model routing to minimize operational costs.
+    Implementing trustworthy decision layers in production LLM architectures: evaluating strict majority voting quorums across heterogeneous models, resolving false consensus in SQL date logic, and formulating an empirical dynamic routing policy.
   </p>
 
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-value">17 / 20</div>
+      <div class="stat-label">Quorum Consensus</div>
+      <div class="stat-sub">85% automated decision rate</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">0.0%</div>
+      <div class="stat-label">False Consensus (3-of-5)</div>
+      <div class="stat-sub">100% precision on decisions</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">487,980 cts</div>
+      <div class="stat-label">Discrepancy Reconciled</div>
+      <div class="stat-sub">6 customers isolated in SQLite</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">15 / 15</div>
+      <div class="stat-label">QA Checks Passed</div>
+      <div class="stat-sub">python3 td2/qa/verify-td2.py</div>
+    </div>
+  </div>
+
   <aside class="notice final">
-    <p><strong>Building on TD 1 Empirical Findings</strong></p>
-    <p>TD 1 revealed that lightweight models achieve near-perfect accuracy (96.7% to 100%) on timestamp and product filters, but drop to 60.0% on completed age arithmetic. TD 2 exploits this gap to build an automated, cost-optimal system.</p>
+    <p><strong>TD 2 Execution Fully Validated Offline</strong></p>
+    <p>All voting algorithms and diagnostic queries operate strictly on stored TD 1 traces (<code>traces-td1.csv</code>) and the certified local database (<code>data/boutique.sqlite</code>). Zero network API spending was incurred. The complete suite of 15 automated verification checks passes with exit code 0.</p>
   </aside>
 
-  <h2>1. Pillar 1: Majority Voting Consensus (<em>k</em>-of-<em>n</em> Quorum)</h2>
+  <!-- ========================================================================= -->
+  <!-- SECTION 1: QUORUM ENGINE ARCHITECTURE                                     -->
+  <!-- ========================================================================= -->
+  <h2>1. Step 1: Quorum Voting Engine Architecture (<code>vote_k_sur_n</code>)</h2>
   <p>
-    When a database query carries operational or financial consequences, trusting a single probabilistic model draw is unacceptable. The voting consensus mechanism operates as follows:
+    When a database query carries financial or operational consequences, relying on a single probabilistic model draw is unacceptable. Pair A (Louis Le Forestier &amp; Maxime Laurent) implemented the production quorum voting engine in <code>td2/skeleton-multi-llm-en.py</code> adhering to five mathematical contract requirements:
   </p>
 
   <div class="cards">
     <div class="card">
-      <div class="pill">Mechanism</div>
-      <h3 class="card-title">Parallel Panel Querying</h3>
-      <p>A query is simultaneously dispatched to <em>n</em> distinct models (e.g., <em>n</em> = 3 or 5). To ensure true independence, the panel must not reuse duplicate backend providers or shared model families.</p>
+      <div class="pill">Contract Rule 1</div>
+      <h3 class="card-title">Strict Majority Requirement</h3>
+      <p>The threshold <em>k</em> must be strictly greater than half the panel size: <code>len(traces_question) // 2 &lt; k &le; len(traces_question)</code>. Any invalid <em>k</em> raises an immediate <code>ValueError</code>, mathematically preventing conflicting consensuses.</p>
     </div>
     <div class="card">
-      <div class="pill">Verification</div>
-      <h3 class="card-title">Sandboxed Execution &amp; Value Matching</h3>
-      <p>Model SQL queries are executed independently in the SQLite read-only sandbox. Votes are cast on the <em>computed numerical revenue</em> (<code>revenue_cents</code>), not on verbatim SQL string similarity.</p>
+      <div class="pill">Contract Rule 2</div>
+      <h3 class="card-title">Provider Unicity (Anti-Collusion)</h3>
+      <p>Duplicate proposals from identical <code>(provider, model_requested)</code> pairs raise a <code>ValueError</code>. Quorum diversity requires truly independent architectural paths.</p>
     </div>
     <div class="card">
-      <div class="pill">Safety Guardrail</div>
-      <h3 class="card-title">Quorum Threshold &amp; Abstention</h3>
-      <p>If at least <em>k</em> models agree on the identical value (e.g., 2 out of 3, or 3 out of 5), that value is accepted. Otherwise, the system safely <strong>abstains</strong> rather than outputting a hallucinated figure.</p>
+      <div class="pill">Contract Rule 3</div>
+      <h3 class="card-title">Error Retention in Denominator <em>n</em></h3>
+      <p>Proposals failing execution (HTTP 429, timeouts, SQL syntax errors) remain counted in the total panel size <em>n</em> but cast zero votes. Infrastructure outages raise the barrier to consensus rather than lowering it.</p>
+    </div>
+    <div class="card">
+      <div class="pill">Contract Rule 4</div>
+      <h3 class="card-title">Deterministic Abstention</h3>
+      <p>If no candidate integer value reaches at least <em>k</em> votes, the engine returns <code>consensus: False</code> and <code>value: None</code>. Under no circumstances does the engine fabricate an answer or take an average.</p>
     </div>
   </div>
 
-  <h2>2. Pillar 2: Dynamic Difficulty Routing</h2>
+  <h3>Engine Interface &amp; Return Payload</h3>
+  <pre><code># Method signature in Orchestrateur class:
+def vote_k_sur_n(self, traces_question: list[dict], k: int) -> dict:
+    ...
+    # Reached consensus:
+    return {"consensus": True, "value": winning_value, "votes": max_votes, "models": agreeing_models}
+    # Safe abstention:
+    return {"consensus": False, "value": None, "votes": max_votes, "models": []}</code></pre>
+
+  <h3>Synthetic Test Suite Validation (<code>atelier-vote.py</code>)</h3>
+  <p>The consensus engine was certified against four synthetic edge-case scenarios:</p>
+  <ul>
+    <li><strong>Agreement (3-of-3):</strong> Inputs <code>[100, 100, 120]</code> with <em>k</em>=2 &rarr; <code>consensus: True, value: 100, votes: 2</code> (Consensus reached).</li>
+    <li><strong>Disagreement (1-1-1 Dispersion):</strong> Inputs <code>[100, 110, 120]</code> with <em>k</em>=2 &rarr; <code>consensus: False, value: None, votes: 1</code> (Safe abstention).</li>
+    <li><strong>Unavailable / Timeout:</strong> Inputs <code>[100, None, None]</code> with <em>k</em>=2 &rarr; <code>consensus: False, value: None, votes: 1</code> (Denomination <em>n</em>=3 preserved, abstention).</li>
+    <li><strong>Correlated Error:</strong> Inputs <code>[0, 0, 100]</code> with reference 100 &rarr; <code>consensus: True, value: 0, votes: 2</code> (Demonstrates that a quorum filters independent noise, but cannot fix correlated failure modes without external checks).</li>
+  </ul>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 2: 20-QUESTION BENCHMARK MATRIX                                   -->
+  <!-- ========================================================================= -->
+  <h2>2. Twenty-Question Benchmark Matrix: 2-of-3 vs. 3-of-5 Quorum</h2>
   <p>
-    Instead of sending all questions to expensive frontier models, a pre-inference rule inspects request complexity and selects the cheapest model capable of reliable answering:
+    We evaluated two distinct operational configurations across all twenty benchmark questions from TD 1:
+  </p>
+  <ul>
+    <li><strong>Fixed 2-of-3 Panel:</strong> <code>openai/gpt-oss-120b</code>, <code>cohere/north-mini-code:free</code>, and <code>qwen/qwen3.8-27b</code> with threshold <em>k</em> = 2.</li>
+    <li><strong>Full 3-of-5 Quorum:</strong> All five models (adding <code>openai/gpt-oss-20b</code> and <code>dots-studio/dots-3-note-preview:free</code>) with threshold <em>k</em> = 3.</li>
+  </ul>
+
+  <div class="tableau">
+    <table>
+      <thead>
+        <tr>
+          <th>Case</th>
+          <th>Family</th>
+          <th>Ground Truth (cents)</th>
+          <th>2-of-3 Panel (<em>k</em>=2)</th>
+          <th>3-of-5 Quorum (<em>k</em>=3)</th>
+          <th>Quorum Transition Analysis</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>C01</strong></td>
+          <td>F1 (Period)</td>
+          <td>792,800</td>
+          <td>792,800 (3v) <span class="badge ok">OK</span></td>
+          <td>792,800 (5v) <span class="badge ok">OK</span></td>
+          <td>Unanimous across all available models.</td>
+        </tr>
+        <tr>
+          <td><strong>C02</strong></td>
+          <td>F2 (Age)</td>
+          <td>590,320</td>
+          <td>590,320 (2v) <span class="badge ok">OK</span></td>
+          <td>590,320 (3v) <span class="badge ok">OK</span></td>
+          <td>120b + Qwen agree; Cohere failed (0); 20b failed (0); Dots agreed.</td>
+        </tr>
+        <tr>
+          <td><strong>C03</strong></td>
+          <td>F3 (Product)</td>
+          <td>936,350</td>
+          <td>936,350 (3v) <span class="badge ok">OK</span></td>
+          <td>936,350 (5v) <span class="badge ok">OK</span></td>
+          <td>Unanimous across all five models.</td>
+        </tr>
+        <tr>
+          <td><strong>C04</strong></td>
+          <td>F1 (Period)</td>
+          <td>2,826,250</td>
+          <td>2,826,250 (3v) <span class="badge ok">OK</span></td>
+          <td>2,826,250 (5v) <span class="badge ok">OK</span></td>
+          <td>Unanimous across all five models.</td>
+        </tr>
+        <tr>
+          <td><strong>C05</strong></td>
+          <td>F1 (Period)</td>
+          <td>38,480</td>
+          <td>38,480 (3v) <span class="badge ok">OK</span></td>
+          <td>38,480 (5v) <span class="badge ok">OK</span></td>
+          <td>Unanimous across all five models.</td>
+        </tr>
+        <tr>
+          <td><strong>C06</strong></td>
+          <td>F1 (Period)</td>
+          <td>0</td>
+          <td>0 (3v) <span class="badge ok">OK</span></td>
+          <td>0 (5v) <span class="badge ok">OK</span></td>
+          <td>Genuine zero-match period; unanimous agreement.</td>
+        </tr>
+        <tr>
+          <td><strong>C07</strong></td>
+          <td>F1 (Period)</td>
+          <td>13,970</td>
+          <td>13,970 (3v) <span class="badge ok">OK</span></td>
+          <td>13,970 (5v) <span class="badge ok">OK</span></td>
+          <td>Unanimous across all five models.</td>
+        </tr>
+        <tr>
+          <td><strong>C08</strong></td>
+          <td>F2 (Age)</td>
+          <td>605,580</td>
+          <td>605,580 (2v) <span class="badge ok">OK</span></td>
+          <td>605,580 (4v) <span class="badge ok">OK</span></td>
+          <td>120b + Qwen agree; Cohere failed; 20b + Dots agreed in 3-of-5.</td>
+        </tr>
+        <tr style="background: #fde8e8;">
+          <td><strong>C09</strong></td>
+          <td>F2 (Age)</td>
+          <td>487,980</td>
+          <td><strong>0 (2v) <span class="badge error">WRONG</span></strong></td>
+          <td><strong>Abstain (max 2v) <span class="badge ok">SAFE</span></strong></td>
+          <td><strong>Critical False Consensus Suppression:</strong> Cohere &amp; Qwen voted 0 against 120b. Adding 20b (487,980) and Dots (rejected) yields 2 vs 2 tie &lt; 3; safe abstention.</td>
+        </tr>
+        <tr>
+          <td><strong>C10</strong></td>
+          <td>F2b (Order Age)</td>
+          <td>558,980</td>
+          <td>Abstain (max 1v) <span class="badge neutral">ABSTAIN</span></td>
+          <td>Abstain (max 2v) <span class="badge neutral">ABSTAIN</span></td>
+          <td>Dispersion: 2-of-3 split 1-1-1. In 3-of-5, Qwen &amp; Dots both voted 119,410, but 2 votes &lt; 3; safe abstention.</td>
+        </tr>
+        <tr>
+          <td><strong>C11</strong></td>
+          <td>F2 (Age)</td>
+          <td>446,690</td>
+          <td>446,690 (2v) <span class="badge ok">OK</span></td>
+          <td>446,690 (3v) <span class="badge ok">OK</span></td>
+          <td>120b + Qwen agree; Cohere failed; Dots agreed in 3-of-5.</td>
+        </tr>
+        <tr>
+          <td><strong>C12</strong></td>
+          <td>F3 (Product)</td>
+          <td>1,666,490</td>
+          <td>1,666,490 (3v) <span class="badge ok">OK</span></td>
+          <td>1,666,490 (5v) <span class="badge ok">OK</span></td>
+          <td>Unanimous across all five models.</td>
+        </tr>
+        <tr>
+          <td><strong>C13</strong></td>
+          <td>F3 (Product)</td>
+          <td>107,740</td>
+          <td>107,740 (3v) <span class="badge ok">OK</span></td>
+          <td>107,740 (5v) <span class="badge ok">OK</span></td>
+          <td>Unanimous across all five models.</td>
+        </tr>
+        <tr>
+          <td><strong>C14</strong></td>
+          <td>F3 (Product)</td>
+          <td>0</td>
+          <td>0 (3v) <span class="badge ok">OK</span></td>
+          <td>0 (5v) <span class="badge ok">OK</span></td>
+          <td>Zero-match product query; unanimous agreement.</td>
+        </tr>
+        <tr>
+          <td><strong>C15</strong></td>
+          <td>F1+F2</td>
+          <td>168,680</td>
+          <td>168,680 (2v) <span class="badge ok">OK</span></td>
+          <td>168,680 (3v) <span class="badge ok">OK</span></td>
+          <td>120b + Cohere agree; Qwen failed; 20b agreed in 3-of-5.</td>
+        </tr>
+        <tr>
+          <td><strong>C16</strong></td>
+          <td>F2+F3</td>
+          <td>376,740</td>
+          <td>376,740 (2v) <span class="badge ok">OK</span></td>
+          <td>376,740 (3v) <span class="badge ok">OK</span></td>
+          <td><strong>Quota Resilience:</strong> Qwen blocked by HTTP 429. 120b + Cohere form 2/3. In 3-of-5, 20b agrees &rarr; 3/5 consensus.</td>
+        </tr>
+        <tr>
+          <td><strong>C17</strong></td>
+          <td>F1+F2+F3</td>
+          <td>258,180</td>
+          <td>Abstain (max 1v) <span class="badge neutral">ABSTAIN</span></td>
+          <td>Abstain (max 2v) <span class="badge neutral">ABSTAIN</span></td>
+          <td>Severe dispersion: 120b returned 258,180, Cohere 0, Qwen 835,800. In 3-of-5, 20b agrees with 120b, but 2 votes &lt; 3 &rarr; safe abstention.</td>
+        </tr>
+        <tr>
+          <td><strong>C18</strong></td>
+          <td>F1+F2b</td>
+          <td>62,480</td>
+          <td>62,480 (3v) <span class="badge ok">OK</span></td>
+          <td>62,480 (5v) <span class="badge ok">OK</span></td>
+          <td>Unanimous across all models (Qwen recovered on retry).</td>
+        </tr>
+        <tr style="background: #eef7f1;">
+          <td><strong>C19</strong></td>
+          <td>F1+F2+F3</td>
+          <td>1,990</td>
+          <td><strong>Abstain (max 1v) <span class="badge neutral">ABSTAIN</span></strong></td>
+          <td><strong>1,990 (3v) <span class="badge ok">RECOVERED</span></strong></td>
+          <td><strong>Consensus Recovery:</strong> 2-of-3 split 1-1-1 (1,990 / 83,580 / 13,930). Expanding to 3-of-5 brought 20b and Dots, reaching a 3/5 majority for 1,990.</td>
+        </tr>
+        <tr>
+          <td><strong>C20</strong></td>
+          <td>F1 (Period)</td>
+          <td>1,106,090</td>
+          <td>1,106,090 (2v) <span class="badge ok">OK</span></td>
+          <td>1,106,090 (4v) <span class="badge ok">OK</span></td>
+          <td><strong>Quota Resilience:</strong> Qwen 429 quota exhaustion. 120b + Cohere form 2/3. In 3-of-5, 20b and Dots agree &rarr; 4/5 consensus.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Deep-Dive Transition Cards -->
+  <div class="cards">
+    <div class="card">
+      <div class="pill">Key Finding 1</div>
+      <h3 class="card-title">C09 False Consensus Elimination</h3>
+      <p>
+        In 2-of-3, two different models (Cohere &amp; Qwen) both returned <code>0</code> due to independent date syntax bugs, triggering a <strong>False Consensus</strong> on 0 (ground truth: 487,980). Moving to 3-of-5 added GPT-20B (487,980) and Dots (rejected), producing a 2-2 tie. Because 2 &lt; 3, the quorum <strong>safely abstained</strong>, completely eliminating the 5.0% error rate.
+      </p>
+    </div>
+    <div class="card">
+      <div class="pill">Key Finding 2</div>
+      <h3 class="card-title">C19 Ground Truth Recovery</h3>
+      <p>
+        On question C19, the 2-of-3 panel abstained due to total dispersion (1 vote for 1,990, 1 for 13,930, 1 for 83,580). The 3-of-5 quorum recovered the true ground truth (<code>1,990</code> cents) with 3/5 votes (GPT-120B, GPT-20B, Dots-Studio), converting an abstention into an automated success.
+      </p>
+    </div>
+    <div class="card">
+      <div class="pill">Key Finding 3</div>
+      <h3 class="card-title">Resilience to Rate Limits (HTTP 429)</h3>
+      <p>
+        On C16 and C20, Qwen exhausted Groq's 1,000 OTPM quota. Under the quorum contract, Qwen remained counted in <em>n</em>=3 and <em>n</em>=5, but healthy models formed clear majorities (2/3 and 4/5), demonstrating operational resilience without lowering the consensus threshold.
+      </p>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 3: SHARED FALSE CONSENSUS INVESTIGATION                           -->
+  <!-- ========================================================================= -->
+  <h2>3. Step 2: Shared False Consensus Investigation (Group B)</h2>
+  <p>
+    Group B (Baptiste Noailhac, Jean Jaunet, Romain Thepaut) audited the 100 TD 1 cells for shared incorrect values, identifying question <strong>C09</strong> as the sole false consensus that wins the 2-of-3 vote.
+  </p>
+
+  <h3>Why Independent Models Converged on Zero: The "Attractor State"</h3>
+  <p>
+    Question C09 asks for revenue from customers aged exactly 25 on <code>2026-09-26</code> (birth date window: <code>2000-09-27</code> to <code>2001-09-26</code> inclusive). Both failing models missed this window entirely through two completely unrelated errors:
+  </p>
+  <ul>
+    <li><strong>Cohere (<code>north-mini-code</code>):</strong> Attempted to compute age as <code>CAST(SUBSTR(birth_date,1,4) AS INT) - CASE ...</code>, which evaluated to the birth year minus a correction (~2000), never subtracting from 2026. The condition <code>... = 25</code> matched 0 rows.</li>
+    <li><strong>Qwen (<code>qwen3.8-27b</code>):</strong> Subtracted the order date <code>o.date</code> instead of the reference date, and forced contradictory conditions: <code>birth_date &gt;= '2001-09-26' AND birth_date &lt;= '2001-09-25'</code>, which is logically impossible and matched 0 rows.</li>
+  </ul>
+
+  <aside class="notice warning">
+    <p><strong>The Zero Attractor State in SQL</strong></p>
+    <p>In SQL aggregations, any query whose <code>WHERE</code> filter selects zero rows returns <code>NULL</code>, which <code>COALESCE(SUM(...), 0)</code> converts to <code>0</code>. Distinct, uncorrelated semantic errors naturally collapse into <code>0</code>. Agreement on zero is therefore weak evidence and requires an explicit verification guardrail.</p>
+  </aside>
+
+  <h3>Delta Diagnostic Query &amp; Cent Reconciliation (<code>boutique.sqlite</code>)</h3>
+  <p>
+    Executing the delta diagnostic query on <code>data/boutique.sqlite</code> isolates the exact population missed by the faulty queries:
   </p>
 
   <div class="tableau">
     <table>
       <thead>
         <tr>
-          <th>Query Complexity Tier</th>
-          <th>Question Characteristics</th>
-          <th>Routing Decision</th>
-          <th>Economic Rationale</th>
+          <th>Customer ID</th>
+          <th>Birth Date</th>
+          <th>Total Orders</th>
+          <th>Revenue (cents)</th>
+          <th>Relational Boundary Impact</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td><strong>Tier 1: Simple Period / Product</strong></td>
-          <td>Orders between dates, product categories (C01, C03, C04, C05, C07, C12, C13, C20).</td>
-          <td>Route to <strong>Tier 1 Compact Model</strong> (e.g., GPT-OSS 20B or Dots).</td>
-          <td>Near 100% accuracy at zero / minimal token cost.</td>
+          <td><strong>C001</strong></td>
+          <td>2000-11-14</td>
+          <td>4</td>
+          <td>117,160</td>
+          <td>Aged 25 on reference date; dropped by empty filter</td>
         </tr>
         <tr>
-          <td><strong>Tier 2: Complex Boundary / Age</strong></td>
-          <td>Exact completed age at order time or reference date (C02, C08-C11, C15-C19).</td>
-          <td>Route to <strong>Frontier Model</strong> (GPT-120B) OR <strong>3-Model Voting Panel</strong>.</td>
-          <td>Prevents severe calendar date miscalculations identified in TD 1.</td>
+          <td><strong>C002</strong></td>
+          <td>2000-12-04</td>
+          <td>4</td>
+          <td>117,160</td>
+          <td>Aged 25 on reference date; dropped by empty filter</td>
+        </tr>
+        <tr>
+          <td><strong>C007</strong></td>
+          <td>2000-10-14</td>
+          <td>4</td>
+          <td>117,160</td>
+          <td>Aged 25 on reference date; dropped by empty filter</td>
+        </tr>
+        <tr>
+          <td><strong>C008</strong></td>
+          <td>2001-08-23</td>
+          <td>2</td>
+          <td>47,900</td>
+          <td>Aged 25 on reference date; dropped by empty filter</td>
+        </tr>
+        <tr>
+          <td><strong>C009</strong></td>
+          <td>2001-06-21</td>
+          <td>2</td>
+          <td>40,700</td>
+          <td>Aged 25 on reference date; dropped by empty filter</td>
+        </tr>
+        <tr>
+          <td><strong>C003</strong></td>
+          <td>2001-09-26</td>
+          <td>4</td>
+          <td>47,900</td>
+          <td><strong>Upper inclusive boundary:</strong> turned 25 on 2026-09-26</td>
+        </tr>
+        <tr style="font-weight: 700; background: #eef3f6;">
+          <td colspan="3">Reconciled Total Discrepancy</td>
+          <td>487,980 cts</td>
+          <td>487,980 (Reference) - 0 (Faulty Models) = 487,980 cts</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <h2>3. TD 2 Workshop Modules</h2>
+  <!-- ========================================================================= -->
+  <!-- SECTION 4: EMPIRICAL ROUTING POLICY & SIMULATION                          -->
+  <!-- ========================================================================= -->
+  <h2>4. Step 3: Empirical Dynamic Routing Policy &amp; Simulation (Pair C)</h2>
+  <p>
+    Pair C (Alexandre Jullien Gaildraud &amp; Valentin Gourmelon) formulated a production routing policy directly grounded in the empirical accuracy rates observed across the 100 TD 1 cells.
+  </p>
+
+  <h3>Empirical Accuracy Rate Table (8 Families &times; 5 Models)</h3>
+  <p>Rates are computed strictly as <em>correct / cases</em> (where an unexecuted 429 counts as a miss):</p>
+
+  <div class="tableau">
+    <table>
+      <thead>
+        <tr>
+          <th>Question Family</th>
+          <th>Cases</th>
+          <th><code>gpt-120b</code></th>
+          <th><code>gpt-20b</code></th>
+          <th><code>qwen-27b</code></th>
+          <th><code>north-mini</code></th>
+          <th><code>dots-3</code></th>
+          <th>Routing Eligibility &amp; Verification Rule</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>F1 (Period)</strong></td>
+          <td>6</td>
+          <td>6/6 (100%)</td>
+          <td>6/6 (100%)</td>
+          <td>5/6 (83% - 429)</td>
+          <td>6/6 (100%)</td>
+          <td>6/6 (100%)</td>
+          <td>Dispatch to <strong>lowest-cost model</strong> (<code>gpt-20b</code> or <code>dots</code>). No check for internal dashboard.</td>
+        </tr>
+        <tr>
+          <td><strong>F2 (Age at Date)</strong></td>
+          <td>4</td>
+          <td><strong>4/4 (100%)</strong></td>
+          <td>2/4 (50%)</td>
+          <td>3/4 (75%)</td>
+          <td>0/4 (0%)</td>
+          <td>3/4 (75%)</td>
+          <td><strong>Only <code>gpt-120b</code> eligible.</strong> Deterministic SQL reference query required.</td>
+        </tr>
+        <tr>
+          <td><strong>F2b (Age at Order)</strong></td>
+          <td>1</td>
+          <td><strong>1/1 (100%)</strong></td>
+          <td><strong>1/1 (100%)</strong></td>
+          <td>0/1 (0%)</td>
+          <td>0/1 (0%)</td>
+          <td>0/1 (0%)</td>
+          <td>Dispatch to <code>gpt-20b</code> with zero-value sanity check.</td>
+        </tr>
+        <tr>
+          <td><strong>F3 (Product)</strong></td>
+          <td>4</td>
+          <td>4/4 (100%)</td>
+          <td>4/4 (100%)</td>
+          <td>4/4 (100%)</td>
+          <td>4/4 (100%)</td>
+          <td>4/4 (100%)</td>
+          <td>All models 100%. Dispatch to <code>qwen-27b</code>; lightweight 2-of-3 for customer.</td>
+        </tr>
+        <tr>
+          <td><strong>F1+F2</strong></td>
+          <td>1</td>
+          <td>1/1 (100%)</td>
+          <td>1/1 (100%)</td>
+          <td>1/1 (100%)</td>
+          <td>1/1 (100%)</td>
+          <td>1/1 (100%)</td>
+          <td>Inherits F2 failure risk: only <code>gpt-120b</code> eligible.</td>
+        </tr>
+        <tr>
+          <td><strong>F2+F3</strong></td>
+          <td>1</td>
+          <td>1/1 (100%)</td>
+          <td>1/1 (100%)</td>
+          <td>1/1 (100%)</td>
+          <td>1/1 (100%)</td>
+          <td>1/1 (100%)</td>
+          <td>Inherits F2 failure risk: only <code>gpt-120b</code> eligible.</td>
+        </tr>
+        <tr>
+          <td><strong>F1+F2+F3</strong></td>
+          <td>2</td>
+          <td><strong>2/2 (100%)</strong></td>
+          <td><strong>2/2 (100%)</strong></td>
+          <td>0/2 (0%)</td>
+          <td>0/2 (0%)</td>
+          <td>1/2 (50%)</td>
+          <td>Only <code>gpt-120b</code> eligible for customer/payout workloads.</td>
+        </tr>
+        <tr>
+          <td><strong>F1+F2b</strong></td>
+          <td>1</td>
+          <td>1/1 (100%)</td>
+          <td>1/1 (100%)</td>
+          <td>1/1 (100%)</td>
+          <td>1/1 (100%)</td>
+          <td>1/1 (100%)</td>
+          <td>Inherits F2b: <code>gpt-20b</code> eligible.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Queue Priority Analysis: Allocation vs. Free Deferral</h3>
+  <p>
+    In <code>atelier-routage.py</code>, the <code>choose</code> scheduler examines resources in a strict order:
+  </p>
+  <ol>
+    <li>Available routes with zero cash cost (including <strong>subscription allocations</strong> where capital expenditure is already sunk).</li>
+    <li>Free refill routes that reset within the request deadline (action: <code>defer</code>).</li>
+    <li>Paid on-demand routes within budget (action: <code>run</code> with cash spend).</li>
+    <li>Safe abstention when no route meets the quality, deadline, or budget constraints.</li>
+  </ol>
+  <p>
+    <strong>Why an available allocation beats waiting for a free refill:</strong> Consuming pre-purchased allocation delivers immediate responses with zero latency penalties and avoids queuing overhead. This priority reverses only when allocation is scarce/metered and the request is latency-tolerant (e.g. nightly batch).
+  </p>
+
+  <h3>Simulation Reproduction (11 Scenarios in <code>simulator-after.jsonl</code>)</h3>
+  <p>Running <code>python3 td2/atelier-routage.py</code> reproduces all 11 production scenarios with exact TD 1 cell citations:</p>
+  <ul>
+    <li><code>simple</code> (F1, dashboard): <code>run</code> on <code>gpt-oss-20b#groq</code> (cash: $0.00, checks: none).</li>
+    <li><code>complex</code> (F2, customer): <code>run</code> on <code>gpt-oss-120b#groq</code> (cash: $0.00, checks: reference query).</li>
+    <li><code>deferrable</code> (F2, exhausted): <code>defer</code> for 60 min until free quota refills.</li>
+    <li><code>urgent</code> (F2, 5 min deadline): <code>run</code> on paid <code>gpt-oss-120b#openrouter</code> (cash: $0.000711).</li>
+    <li><code>budget exhausted</code>: <code>abstain</code> (safe zero-output when paid route exceeds budget).</li>
+    <li><code>high impact</code> (F2, payout): <code>run</code> on <code>gpt-120b</code> with reference query AND human sign-off.</li>
+    <li><code>unknown capability</code> (F4): <code>abstain</code> (no TD 1 empirical cell).</li>
+    <li><code>product for customer</code> (F3): <code>run</code> on <code>qwen3.8-27b</code> with 2-of-3 quorum.</li>
+    <li><code>first model down</code>: failover to <code>north-mini-code</code> with zero latency impact.</li>
+    <li><code>age at order</code> (F2b): <code>run</code> on <code>gpt-oss-20b</code> with zero-value guard.</li>
+    <li><code>combined payout</code> (F1+F2+F3): <code>run</code> on <code>gpt-120b</code> with dual-level verification.</li>
+  </ul>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 5: STEP 4 PLENARY BRIEFING                                        -->
+  <!-- ========================================================================= -->
+  <h2>5. Step 4: Plenary Presentation &amp; The "Price of Checking"</h2>
   <div class="cards">
     <div class="card">
-      <h3 class="card-title"><code>atelier-vote.py</code></h3>
-      <p>Harness for testing the quorum voting algorithm across four key operational edge cases:</p>
-      <ul>
-        <li><strong>Consensus agreement:</strong> Models return matching values; quorum met.</li>
-        <li><strong>Consensus disagreement:</strong> Models diverge; verified safe abstention.</li>
-        <li><strong>Provider outage (HTTP 429/timeout):</strong> Graceful quorum degradation.</li>
-        <li><strong>Duplicate routes:</strong> Detecting and rejecting false consensus from duplicate models.</li>
-      </ul>
+      <div class="pill">Slide 1: Quorum Benchmark</div>
+      <h3 class="card-title">100% Precision on 3-of-5</h3>
+      <p>Both 2-of-3 and 3-of-5 reach 17/20 consensus (85%). But 2-of-3 validates a false consensus on C09 (5% error), while 3-of-5 converts it into a safe abstention and recovers C19, achieving 100% precision on decisions.</p>
     </div>
-
     <div class="card">
-      <h3 class="card-title"><code>atelier-routage.py</code></h3>
-      <p>Benchmarking harness evaluating the routing rule against seven distinct real-world traffic scenarios, balancing accuracy against total API expenditure.</p>
+      <div class="pill">Slide 2: SQL Attractor State</div>
+      <h3 class="card-title">The C09 Empirical Trap</h3>
+      <p>Empty filters converge on 0 via <code>COALESCE(SUM, 0)</code>. Dissecting the SQLite database with our delta query proved that 6 customers accounted for all 487,980 cents missed by the models.</p>
     </div>
+    <div class="card">
+      <div class="pill">Slide 3: Economic Architecture</div>
+      <h3 class="card-title">The Price of Checking</h3>
+      <p>No free model is sufficient on its own for completed customer age. This establishes the price of checking for TD 3: a deterministic reference SQL query (≈$0), a paid flagship route ($0.000711/query), or human sign-off.</p>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 6: TEAM CONTRIBUTIONS & VERIFICATION                              -->
+  <!-- ========================================================================= -->
+  <h2>6. Quality Assurance &amp; Sub-group Contributions</h2>
+  <div class="tableau">
+    <table>
+      <thead>
+        <tr>
+          <th>Team Member</th>
+          <th>Pair / Role</th>
+          <th>Primary Deliverables Ownership</th>
+          <th>Peer Cross-Checked By</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Louis Le Forestier</strong></td>
+          <td>Pair A (Lead)</td>
+          <td>Quorum voting engine (<code>vote_k_sur_n</code>), synthetic test harness, 20-question matrix</td>
+          <td>Maxime Laurent &amp; Group B</td>
+        </tr>
+        <tr>
+          <td><strong>Maxime Laurent</strong></td>
+          <td>Pair A (Co-Lead)</td>
+          <td>Quorum benchmarking (2-of-3 vs 3-of-5), transition analysis (C09 suppression, C19 recovery)</td>
+          <td>Louis Le Forestier &amp; Pair C</td>
+        </tr>
+        <tr>
+          <td><strong>Baptiste Noailhac</strong></td>
+          <td>Group B</td>
+          <td>100-cell trace audit, C09 false consensus isolation, manual vote verification</td>
+          <td>Jean Jaunet &amp; Romain Thepaut</td>
+        </tr>
+        <tr>
+          <td><strong>Jean Jaunet</strong></td>
+          <td>Group B</td>
+          <td>SQL delta diagnostic query, SQLite execution, 487,980-cent reconciliation</td>
+          <td>Baptiste Noailhac &amp; Pair A</td>
+        </tr>
+        <tr>
+          <td><strong>Alexandre Jullien Gaildraud</strong></td>
+          <td>Pair C</td>
+          <td>Empirical 8x5 rate matrix, 1-page dynamic routing policy, risk-tiered verification rules</td>
+          <td>Valentin Gourmelon &amp; Group B</td>
+        </tr>
+        <tr>
+          <td><strong>Valentin Gourmelon</strong></td>
+          <td>Pair C</td>
+          <td>Simulator adaptation (<code>atelier-routage.py</code>), portfolio resource pricing, queue priority analysis</td>
+          <td>Alexandre Jullien Gaildraud &amp; Pair A</td>
+        </tr>
+        <tr>
+          <td><strong>Romain Thepaut</strong></td>
+          <td>Group B &amp; QA Lead</td>
+          <td>Automated test suite (<code>td2/qa/verify-td2.py</code>, 15/15 PASS), audit log (<code>crosscheck-07.md</code>)</td>
+          <td>Whole Sub-group</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Pre-Submission 15-Item Verification Checklist</h3>
+  <div class="tableau">
+    <table>
+      <thead>
+        <tr>
+          <th>Verification Check</th>
+          <th>Description &amp; Script Target</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>db_fingerprint</code></td>
+          <td>SHA-256 of <code>boutique.sqlite</code> matches official manifest (seed 20260925)</td>
+          <td><span class="badge ok">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>trace_inventory</code></td>
+          <td>104 rows, 100 cells, 20 cases, 5 models, all <code>nature = real</code></td>
+          <td><span class="badge ok">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>reference_queries</code></td>
+          <td>All 20 reference SQL queries re-executed; reproduces all values to the cent</td>
+          <td><span class="badge ok">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>reference_consistency</code></td>
+          <td>Zero conflicts or mismatches across reference answer key</td>
+          <td><span class="badge ok">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>model_accuracy</code></td>
+          <td>Verdict counts match TD 1 report (120b: 20/20, 20b: 18/20, Dots: 15/20, Cohere: 13/20, Qwen: 13/20)</td>
+          <td><span class="badge ok">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>offline_replay</code></td>
+          <td>96 recorded SQL values reproduced; 4 non-executed cells correctly refused</td>
+          <td><span class="badge ok">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>shared_wrong_values</code></td>
+          <td>Exhaustive audit confirms only C02, C09, and C10 have shared incorrect values</td>
+          <td><span class="badge ok">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>quorum_2of3</code></td>
+          <td>17/20 consensus, single false consensus on C09 (0 cts), abstentions C10, C17, C19</td>
+          <td><span class="badge ok">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>quorum_3of5</code></td>
+          <td>17/20 consensus, 0 false consensus, abstentions C09, C10, C17</td>
+          <td><span class="badge ok">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>pair_a_vote</code></td>
+          <td>Strict majority check, duplicate refusal, and all 40 quorum decisions match oracle</td>
+          <td><span class="badge ok">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>skeleton_sync</code></td>
+          <td><code>vote_k_sur_n</code> identical between <code>td1/</code> and <code>td2/skeleton-multi-llm-en.py</code></td>
+          <td><span class="badge ok">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>sql_evidence</code></td>
+          <td>6 delta statements re-executed read-only; 487,980-cent reconciliation verified</td>
+          <td><span class="badge ok">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>sql_verbatim</code></td>
+          <td>Faulty WHERE clauses verbatim from <code>traces-td1.csv</code></td>
+          <td><span class="badge ok">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>pair_c_rates</code></td>
+          <td>8 families &times; 5 models rate table matches traces cell for cell</td>
+          <td><span class="badge ok">PASS</span></td>
+        </tr>
+        <tr>
+          <td><code>pair_c_simulator</code></td>
+          <td>11 simulation scenarios reproduced decision for decision from <code>simulator-after.jsonl</code></td>
+          <td><span class="badge ok">PASS</span></td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </main>
 
 <footer>
   <p>ESILV - Data &amp; Artificial Intelligence Major (Year 4 / S7) · Course: Next-Generation AI (Didier Parisot)</p>
-  <p>Engineering repository for Trustworthy Generative AI · Pack Version <code>2026-10-14-students-1</code></p>
+  <p>Engineering repository for Trustworthy Generative AI · Pack Version <code>2026-11-18-students-5</code></p>
 </footer>
 
 </body>
