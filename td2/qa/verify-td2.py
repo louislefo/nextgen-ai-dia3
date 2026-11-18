@@ -1,18 +1,9 @@
 #!/usr/bin/env python3
-"""TD 2 verification harness: re-derives every figure of the TD 2 report from the
-traces and the database, independently of the code that produced it.
+"""Re-derive every figure of the TD 2 report from traces-td1.csv and boutique.sqlite,
+independently of the deliverables that produced them. Offline, standard library only,
+read-only through sandbox_sqlite. Exit code 1 if any check fails.
 
-Audit role (QA, Audit & Verification). Nothing here is taken on trust: the
-database fingerprint, the trace inventory, the recorded values, the shared wrong
-values, the quorum outcomes and the Pair B delta SQL are all recomputed. The
-vote used for the quorum matrix is a local oracle, written from the TD 2 contract
-and deliberately independent of `Orchestrateur.vote_k_sur_n`; check `pair_a_vote`
-compares the two.
-
-Offline, standard library only, read-only on the database (every query goes
-through `sandbox_sqlite.execute_query`). No API key, no network, no credit.
-
-    python3 td2/qa/verify-td2.py              # all checks, exit code 1 on failure
+    python3 td2/qa/verify-td2.py              # all checks
     python3 td2/qa/verify-td2.py --matrix     # also print the 20-question matrix
 """
 
@@ -25,6 +16,7 @@ import hashlib
 import importlib.util
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -35,8 +27,12 @@ DB = TD2 / "data" / "boutique.sqlite"
 MANIFEST = TD2 / "data" / "manifest.json"
 TRACES = TD2 / "traces-td1.csv"
 REFERENCE = TD2 / "reference-td1.csv"
+QUESTIONS = TD2 / "questions-td1.json"
 SKELETON = TD2 / "skeleton-multi-llm-en.py"
+ROUTER = TD2 / "atelier-routage.py"
 PAIR_B_SQL = TD2 / "pair-b" / "step2-wrong-consensus.sql"
+PAIR_C_AFTER = TD2 / "pair-c" / "simulator-after.jsonl"
+PAIR_C_REPORT = TD2 / "pair-c" / "step3-report-section.md"
 
 # Fingerprint published in README.md section 4 (seed 20260925).
 README_DB_SHA256 = "0077e235adc2ca647b484e3083c98a6d7cae3ef3655ce366a299caf13398fec2"
@@ -69,6 +65,18 @@ EXPECTED_SHARED_WRONG = {
 EXPECTED_2OF3 = {"consensus": 17, "wrong": {"C09": 0}, "abstentions": {"C10", "C17", "C19"}}
 EXPECTED_3OF5 = {"consensus": 17, "wrong": {}, "abstentions": {"C09", "C10", "C17"}}
 
+# Question families, as the `type` field of questions-td1.json names them.
+FAMILIES = {
+    "period": "F1",
+    "age on a reference date": "F2",
+    "age at the time of the order": "F2b",
+    "product list": "F3",
+    "period + age on a reference date": "F1+F2",
+    "age on a reference date + product list": "F2+F3",
+    "period + age on a reference date + product list": "F1+F2+F3",
+    "period + age at the time of the order": "F1+F2b",
+}
+
 # Expected result of each statement of step2-wrong-consensus.sql, in file order.
 # (label, expected 1x1 value) or (label, expected row count, expected total_gap_cents).
 EXPECTED_SQL_EVIDENCE = [
@@ -81,9 +89,6 @@ EXPECTED_SQL_EVIDENCE = [
 ]
 
 
-# --------------------------------------------------------------------------
-# Loading
-# --------------------------------------------------------------------------
 
 def load_sandbox():
     spec = importlib.util.spec_from_file_location("sandbox_sqlite", TD2 / "sandbox_sqlite.py")
@@ -124,17 +129,9 @@ def sql_statements(path):
     return statements
 
 
-# --------------------------------------------------------------------------
-# Vote oracle: the TD 2 contract, reimplemented here for cross-checking only
-# --------------------------------------------------------------------------
 
 def vote_oracle(proposals, k):
-    """k-of-n majority vote. `proposals` are (provider, model, value, executed) tuples.
-
-    Contract: only executed proposals carrying a value vote; an error keeps its
-    place in n; k must be a strict majority; a duplicate panel member is refused;
-    no value is ever invented.
-    """
+    """k-of-n majority vote over (provider, model, value, executed) tuples, per the TD 2 contract."""
     n = len(proposals)
     if not n // 2 < k <= n:
         raise ValueError(f"k={k} is not a strict majority of n={n}")
@@ -165,9 +162,6 @@ def proposals_for(cells, panel, case):
     return proposals
 
 
-# --------------------------------------------------------------------------
-# Checks
-# --------------------------------------------------------------------------
 
 class Report:
     def __init__(self):
@@ -369,6 +363,77 @@ def check_pair_a_vote(report, cells, matrix):
                else f"{len(failures)} deviations: {failures[:4]}")
 
 
+def parse_report_rates(path):
+    """Rate table of section 4.1, read from the report itself rather than restated here."""
+    models, rates = [], {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.startswith("|"):
+            continue
+        cells = [cell.strip() for cell in line.strip("|").split("|")]
+        if not models:
+            for cell in cells[2:]:
+                match = [model for model in EXPECTED_VERDICTS
+                         if model.split("/")[-1].split(":")[0].rstrip("-preview") in cell]
+                if match:
+                    models.append(match[0])
+            continue
+        family = re.match(r"\*{0,2}(F\d+b?(?:\+F\d+b?)*)\b", cells[0])
+        if not family or len(cells) < 2 + len(models):
+            continue
+        scores = [re.search(r"(\d+)/(\d+)", cell) for cell in cells[2:2 + len(models)]]
+        if all(scores):
+            rates[family.group(1)] = {model: score.group(0) for model, score in zip(models, scores)}
+    return rates
+
+
+def check_pair_c_rates(report, cells):
+    """Pair C's per-family rate table, recomputed from the traces and the question types."""
+    published = parse_report_rates(PAIR_C_REPORT)
+    questions = json.loads(QUESTIONS.read_text(encoding="utf-8"))["questions"]
+    by_family = collections.defaultdict(list)
+    for question in questions:
+        by_family[FAMILIES[question["type"]]].append(question["id"])
+    if set(by_family) != set(published):
+        report.add("pair_c_rates", False,
+                   f"families of questions-td1.json {sorted(by_family)} "
+                   f"differ from the report table {sorted(published)}")
+        return
+    diffs = {}
+    for family, ids in by_family.items():
+        for model in EXPECTED_VERDICTS:
+            provider = "groq" if "gpt-oss" in model or "qwen" in model else "openrouter"
+            correct = sum(1 for case in ids if cells[(provider, model, case)]["verdict"] == "correct")
+            measured = f"{correct}/{len(ids)}"
+            if measured != published[family][model]:
+                diffs[f"{family}/{model}"] = f"report {published[family][model]}, traces {measured}"
+    report.add("pair_c_rates", not diffs,
+               f"{len(by_family)} families x {len(EXPECTED_VERDICTS)} models: "
+               f"the section 4.1 table matches the traces cell for cell"
+               if not diffs else f"{diffs}")
+
+
+def check_pair_c_simulator(report):
+    """The captured routing decisions must be what the committed simulator produces today."""
+    try:
+        completed = subprocess.run([sys.executable, ROUTER.name], cwd=ROUTER.parent,
+                                   capture_output=True, text=True, timeout=60)
+    except (OSError, subprocess.SubprocessError) as error:
+        report.add("pair_c_simulator", False, f"{type(error).__name__}: {error}")
+        return
+    if completed.returncode != 0:
+        report.add("pair_c_simulator", False,
+                   f"atelier-routage.py exited {completed.returncode}: {completed.stderr.strip()[:160]}")
+        return
+    produced = [json.loads(line) for line in completed.stdout.splitlines() if line.strip()]
+    captured = [json.loads(line) for line in PAIR_C_AFTER.read_text(encoding="utf-8").splitlines() if line.strip()]
+    drift = [produced[i].get("scenario") for i in range(min(len(produced), len(captured)))
+             if produced[i] != captured[i]]
+    ok = len(produced) == len(captured) and not drift
+    report.add("pair_c_simulator", ok,
+               f"{len(produced)} scenarios, simulator-after.jsonl reproduces exactly" if ok
+               else f"{len(produced)} produced vs {len(captured)} captured, drift on {drift}")
+
+
 def check_sql_evidence(report, sandbox):
     """Re-run Pair B's delta SQL and compare every figure quoted in the report."""
     statements = sql_statements(PAIR_B_SQL)
@@ -459,6 +524,8 @@ def main():
     check_pair_a_vote(report, cells, matrix)
     check_sql_evidence(report, sandbox)
     check_sql_verbatim(report, cells)
+    check_pair_c_rates(report, cells)
+    check_pair_c_simulator(report)
 
     if args.matrix:
         print_matrix(matrix)
