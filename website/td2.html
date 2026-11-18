@@ -35,15 +35,17 @@
 
 <main>
   <div class="meta-bar">
-    <span>Module: TD 2 Architecture</span>
+    <span>Session: 2026-11-18</span>
     <span>Consensus: Strict Majority k-of-n</span>
     <span>Routing: Empirical 8x5 Table</span>
-    <span>Status: Completed &amp; Verified (15/15 PASS)</span>
+    <span>Status: Completed &amp; Verified (16/16 PASS)</span>
   </div>
 
   <h1>TD 2: Majority Quorum Consensus &amp; Dynamic Model Routing</h1>
   <p class="lead">
-    Implementing trustworthy decision layers in production LLM architectures: evaluating strict majority voting quorums across heterogeneous models, resolving false consensus in SQL date logic, and formulating an empirical dynamic routing policy.
+    Two decision systems built on the TD 1 traces, entirely offline: a strict <em>k</em>-of-<em>n</em> voting quorum and a
+    routing policy derived from measured per-family accuracy. The central empirical finding is that consensus does not guarantee
+    correctness: on question C09, a 2-of-3 panel validated a wrong figure (0 cents), while a 3-of-5 quorum safely suppressed it into an abstention.
   </p>
 
   <div class="stat-grid">
@@ -63,7 +65,7 @@
       <div class="stat-sub">6 customers isolated in SQLite</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value">15 / 15</div>
+      <div class="stat-value">16 / 16</div>
       <div class="stat-label">QA Checks Passed</div>
       <div class="stat-sub">python3 td2/qa/verify-td2.py</div>
     </div>
@@ -71,7 +73,7 @@
 
   <aside class="notice final">
     <p><strong>TD 2 Execution Fully Validated Offline</strong></p>
-    <p>All voting algorithms and diagnostic queries operate strictly on stored TD 1 traces (<code>traces-td1.csv</code>) and the certified local database (<code>data/boutique.sqlite</code>). Zero network API spending was incurred. The complete suite of 15 automated verification checks passes with exit code 0.</p>
+    <p>All voting algorithms and diagnostic queries operate strictly on stored TD 1 traces (<code>traces-td1.csv</code>) and the certified local database (<code>data/boutique.sqlite</code>). Zero network API spending was incurred. The complete suite of 16 automated verification checks passes with exit code 0.</p>
   </aside>
 
   <!-- ========================================================================= -->
@@ -119,7 +121,7 @@ def vote_k_sur_n(self, traces_question: list[dict], k: int) -> dict:
   <ul>
     <li><strong>Agreement (3-of-3):</strong> Inputs <code>[100, 100, 120]</code> with <em>k</em>=2 &rarr; <code>consensus: True, value: 100, votes: 2</code> (Consensus reached).</li>
     <li><strong>Disagreement (1-1-1 Dispersion):</strong> Inputs <code>[100, 110, 120]</code> with <em>k</em>=2 &rarr; <code>consensus: False, value: None, votes: 1</code> (Safe abstention).</li>
-    <li><strong>Unavailable / Timeout:</strong> Inputs <code>[100, None, None]</code> with <em>k</em>=2 &rarr; <code>consensus: False, value: None, votes: 1</code> (Denomination <em>n</em>=3 preserved, abstention).</li>
+    <li><strong>Unavailable / Timeout:</strong> Inputs <code>[100, None, None]</code> with <em>k</em>=2 &rarr; <code>consensus: False, value: None, votes: 1</code> (Denominator <em>n</em>=3 preserved, abstention).</li>
     <li><strong>Correlated Error:</strong> Inputs <code>[0, 0, 100]</code> with reference 100 &rarr; <code>consensus: True, value: 0, votes: 2</code> (Demonstrates that a quorum filters independent noise, but cannot fix correlated failure modes without external checks).</li>
   </ul>
 
@@ -345,7 +347,7 @@ def vote_k_sur_n(self, traces_question: list[dict], k: int) -> dict:
     Group B (Baptiste Noailhac, Jean Jaunet, Romain Thepaut) audited the 100 TD 1 cells for shared incorrect values, identifying question <strong>C09</strong> as the sole false consensus that wins the 2-of-3 vote.
   </p>
 
-  <h3>Why Independent Models Converged on Zero: The "Attractor State"</h3>
+  <h3>Why Independent Models Converged on Zero: The &ldquo;Attractor State&rdquo;</h3>
   <p>
     Question C09 asks for revenue from customers aged exactly 25 on <code>2026-09-26</code> (birth date window: <code>2000-09-27</code> to <code>2001-09-26</code> inclusive). Both failing models missed this window entirely through two completely unrelated errors:
   </p>
@@ -570,7 +572,7 @@ def vote_k_sur_n(self, traces_question: list[dict], k: int) -> dict:
   <!-- ========================================================================= -->
   <!-- SECTION 5: STEP 4 PLENARY BRIEFING                                        -->
   <!-- ========================================================================= -->
-  <h2>5. Step 4: Plenary Presentation &amp; The "Price of Checking"</h2>
+  <h2>5. Step 4: Plenary Presentation &amp; The &ldquo;Price of Checking&rdquo;</h2>
   <div class="cards">
     <div class="card">
       <div class="pill">Slide 1: Quorum Benchmark</div>
@@ -585,7 +587,7 @@ def vote_k_sur_n(self, traces_question: list[dict], k: int) -> dict:
     <div class="card">
       <div class="pill">Slide 3: Economic Architecture</div>
       <h3 class="card-title">The Price of Checking</h3>
-      <p>No free model is sufficient on its own for completed customer age. This establishes the price of checking for TD 3: a deterministic reference SQL query (≈$0), a paid flagship route ($0.000711/query), or human sign-off.</p>
+      <p>No free model is sufficient on its own for completed customer age. This establishes the price of checking for TD 3: a deterministic reference SQL query (&approx;$0), a paid flagship route ($0.000711/query), or human sign-off.</p>
     </div>
   </div>
 
@@ -643,14 +645,14 @@ def vote_k_sur_n(self, traces_question: list[dict], k: int) -> dict:
         <tr>
           <td><strong>Romain Thepaut</strong></td>
           <td>Group B &amp; QA Lead</td>
-          <td>Automated test suite (<code>td2/qa/verify-td2.py</code>, 15/15 PASS), audit log (<code>crosscheck-07.md</code>)</td>
+          <td>Automated test suite (<code>td2/qa/verify-td2.py</code>, 16/16 PASS), audit log (<code>crosscheck-07.md</code>)</td>
           <td>Whole Sub-group</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <h3>Pre-Submission 15-Item Verification Checklist</h3>
+  <h3>Pre-Submission 16-Item Verification Checklist</h3>
   <div class="tableau">
     <table>
       <thead>
@@ -717,6 +719,11 @@ def vote_k_sur_n(self, traces_question: list[dict], k: int) -> dict:
           <td><span class="badge ok">PASS</span></td>
         </tr>
         <tr>
+          <td><code>review_claims</code></td>
+          <td>Every reference asserted across <code>reviews/</code> matches <code>reference-td1.csv</code></td>
+          <td><span class="badge ok">PASS</span></td>
+        </tr>
+        <tr>
           <td><code>sql_evidence</code></td>
           <td>6 delta statements re-executed read-only; 487,980-cent reconciliation verified</td>
           <td><span class="badge ok">PASS</span></td>
@@ -739,6 +746,17 @@ def vote_k_sur_n(self, traces_question: list[dict], k: int) -> dict:
       </tbody>
     </table>
   </div>
+
+  <aside class="notice">
+    <p><strong>Limitations we state rather than hide</strong></p>
+    <p>
+      Twenty questions across five models support a <em>batch-specific</em> hypothesis, not a general error rate.
+      F2b rests on a single cell, so &ldquo;100%&rdquo; there means 1/1. The 3-of-5 quorum reached 100% precision on this
+      batch because one extra model happened to be correct on C09 and another happened to be rejected; the
+      measured claim is that widening the panel suppressed this error, not that a quorum cannot produce a wrong
+      consensus.
+    </p>
+  </aside>
 </main>
 
 <footer>

@@ -58,7 +58,7 @@
       <div class="stat-sub">100 base + 4 retries</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value">15 / 15</div>
+      <div class="stat-value">16 / 16</div>
       <div class="stat-label">QA Harness Checks</div>
       <div class="stat-sub">100% PASS on verify-td2.py</div>
     </div>
@@ -70,8 +70,8 @@
   </div>
 
   <aside class="notice final">
-    <p><strong>TD 1 &amp; TD 2 Completed &amp; Verified (15/15 PASS)</strong></p>
-    <p>All 20 ground-truth SQL references and the 100-cell multi-model matrix from TD 1 are certified. TD 2 delivers the complete <code>vote_k_sur_n</code> quorum voting engine, the resolution and SQL delta reconciliation of the shared false consensus C09 (487,980 cents), the 8x5 empirical routing policy, and the 11-scenario simulator. Every deliverable passes the automated offline test suite.</p>
+    <p><strong>TD 1 &amp; TD 2 Completed &amp; Verified (16/16 PASS)</strong></p>
+    <p>All 20 ground-truth SQL references and the 100-cell multi-model matrix from TD 1 are certified. TD 2 delivers the complete <code>vote_k_sur_n</code> quorum voting engine, the resolution and SQL delta reconciliation of the shared false consensus C09 (487,980 cents), the 8x5 empirical routing policy, and the 11-scenario simulator. Every deliverable passes all 16 automated offline QA checks.</p>
   </aside>
 
   <h2>The Core Problem: Confidence vs. Factual Correctness</h2>
@@ -102,10 +102,10 @@
       <h3 class="card-title"><a href="td2.html">TD 2: Quorum Consensus &amp; Dynamic Routing</a></h3>
       <p>Implementation of <code>vote_k_sur_n</code> majority voting consensus, empirical false consensus resolution, and dynamic model routing.</p>
       <ul>
-        <li>Implemented <code>vote_k_sur_n</code> with strict majority threshold and abstention</li>
+        <li>Implemented <code>vote_k_sur_n</code> with strict majority threshold and fail-safe abstention</li>
         <li>Identified &amp; resolved C09 false consensus (487,980 cts gap reconciled across 6 customers in SQLite)</li>
         <li>Derived 8x5 empirical accuracy rate matrix &amp; 1-page routing rule with 11 simulation scenarios</li>
-        <li>Certified by 15/15 scripted checks in <code>verify-td2.py</code> and 7 peer review logs</li>
+        <li>Certified by 16/16 offline verification checks in <code>verify-td2.py</code> and 7 peer review logs</li>
       </ul>
       <p><a href="td2.html">Explore TD 2 Architecture &amp; Benchmark &rarr;</a></p>
     </div>

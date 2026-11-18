@@ -394,7 +394,7 @@ In accordance with the collaborative protocol defined for TD 2, the workload was
 | **Jean Jaunet** | Pair B (Diagnostics) | SQL Delta Analysis | Executable delta SQL queries on `boutique.sqlite`, cent reconciliation (487,980 cts) | Baptiste Noailhac & Pair A |
 | **Alexandre Jullien Gaildraud**| Pair C (Routing) | Routing Policy | 1-page rule, empirical TD 1 accuracy mapping per family, checking tiers | Valentin Gourmelon & Group B |
 | **Valentin Gourmelon** | Pair C (Routing) | Simulator Adaptation | `atelier-routage.py` (`RESOURCES` & `choose`), `simulator-after.jsonl`, queue priority analysis | Alexandre Jullien Gaildraud & Pair A |
-| **Romain Thepaut** | Group B & QA Lead | Automated Test Harness | `td2/qa/verify-td2.py` (15/15 automated checks), SQL audits, `reviews/crosscheck-07.md` | Whole Sub-group |
+| **Romain Thepaut** | Group B & QA Lead | Automated Test Harness | `td2/qa/verify-td2.py` (16/16 automated checks), SQL audits, `reviews/crosscheck-07.md` | Whole Sub-group |
 
 ### 6.3 Pre-Submission Verification Checklist
 
@@ -409,9 +409,10 @@ Prior to final submission, the entire deliverable suite was validated offline us
 - [x] **`quorum_2of3` / `quorum_3of5`**: 17/20 consensus each, 16 correct versus 17, the single wrong consensus on C09, abstentions C10/C17/C19 and C09/C10/C17.
 - [x] **`shared_wrong_values`**: the search over the 100 cells returns exactly C02, C09 and C10, so no shared wrong value was missed.
 - [x] **`pair_c_rates`**: the 8 x 5 rate table of section 4.1 matches the traces cell for cell, families taken from `questions-td1.json`.
+- [x] **`review_claims`**: every reference value asserted in `reviews/` matches `reference-td1.csv` (17 contradictions found and corrected, see `reviews/crosscheck-07.md` F6).
 - [x] **`sql_evidence`**: Statements in `td2/pair-b/step2-wrong-consensus.sql` re-executed; 487,980 cts reconciliation verified.
 - [x] **`pair_c_simulator`**: `atelier-routage.py` reproduces all 11 decisions in `simulator-after.jsonl`.
-- [x] **Automated Harness Pass**: `python3 td2/qa/verify-td2.py` reports **15/15 PASS** (exit code 0).
+- [x] **Automated Harness Pass**: `python3 td2/qa/verify-td2.py` reports **16/16 PASS** (exit code 0).
 
 ---
 
