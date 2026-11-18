@@ -16,7 +16,7 @@ The sub-group is split into three operational pairs, with defined primary owners
 | Pair | Members (Roster) | Primary Role | Assigned Step | Key Deliverable |
 |---|---|---|---|---|
 | **Pair A** | **Louis Le Forestier**<br>**Maxime Laurent** | Consensus Engineering | **Step 1**: $k$-of-$n$ Quorum Voting | `skeleton-multi-llm-en.py` (`vote_k_sur_n`), 20-question comparison matrix (2-of-3 vs 3-of-5) |
-| **Pair B** | **Baptiste Noailhac**<br>**Jean Jaunet**<br>*(Support: Romain Thepaut)* | SQL Diagnostics & Evidence Auditing | **Step 2**: False Consensus Investigation | False consensus root-cause analysis, delta SQL diagnostic on `boutique.sqlite`, discrepancy reconciliation |
+| **Group B** | **Baptiste Noailhac**<br>**Jean Jaunet**<br>**Romain Thepaut** | SQL Diagnostics & Evidence Auditing | **Step 2**: False Consensus Investigation | False consensus root-cause analysis, delta SQL diagnostic on `boutique.sqlite`, discrepancy reconciliation |
 | **Pair C** | **Alexandre Jullien Gaildraud**<br>**Valentin Gourmelon** | Routing Architecture & Cost Simulation | **Step 3**: Dynamic Routing Rule | 1-page Routing Policy, adapted `atelier-routage.py` (`RESOURCES` & `choose`), queue priority analysis |
 
 ---

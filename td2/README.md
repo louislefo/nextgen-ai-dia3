@@ -55,8 +55,8 @@ The session is organized into three parallel operational tracks, followed by an 
   2. Validate with synthetic test cases: `python atelier-vote.py`.
   3. Build the 20-question comparison matrix comparing the fixed 2-of-3 panel (`gpt-oss-120b`, `north-mini-code:free`, `qwen3.8-27b` with $k=2$) against the 3-of-5 quorum across all TD 1 models.
 
-### Pair B: Step 2 - False Consensus Investigation & SQL Delta
-* **Engineers**: **Baptiste Noailhac**, **Valentin Gourmelon** *(Support: Romain Thepaut)*
+### Group B: Step 2 - False Consensus Investigation & SQL Delta
+* **Engineers**: **Baptiste Noailhac**, **Jean Jaunet**, **Romain Thepaut**
 * **Core Tasks**:
   1. Audit TD 1 traces for identical wrong answers (`verdict == "incorrect"` with identical `value`) or inspect historical benchmark case `DEMO-SQL-C11` (where `openai/gpt-oss-20b` and `cohere/north-mini-code:free` both return `0` on C11).
   2. Diagnose faulty SQL clauses in both queries (`c.birth_date = '2001-12-01'` vs contradictory date window).
@@ -64,7 +64,7 @@ The session is organized into three parallel operational tracks, followed by an 
   4. Assess quorum outcome: show whether the false consensus wins 2-of-3, wins 3-of-5, or is suppressed.
 
 ### Pair C: Step 3 - Routing Architecture & Simulator Adaptation
-* **Engineers**: **Alexandre Jullien Gaildraud**, **Jean Jaunet**
+* **Engineers**: **Alexandre Jullien Gaildraud**, **Valentin Gourmelon**
 * **Core Tasks**:
   1. Calculate empirical TD 1 accuracy rates per question family ($F1$ period, $F2$ age at date, $F2b$ age at order, $F3$ product).
   2. Author 1-page routing policy: dispatch lowest-cost capable model, enforce risk-tiered checking (none only for internal dashboards with 100% TD 1 accuracy, quorum/verification for customer-facing and payouts), and define failover/abstention rules.
