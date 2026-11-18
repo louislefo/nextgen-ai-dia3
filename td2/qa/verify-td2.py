@@ -35,6 +35,7 @@ ROUTER = TD2 / "atelier-routage.py"
 PAIR_B_SQL = TD2 / "pair-b" / "step2-wrong-consensus.sql"
 PAIR_C_AFTER = TD2 / "pair-c" / "simulator-after.jsonl"
 PAIR_C_REPORT = TD2 / "pair-c" / "step3-report-section.md"
+REVIEWS = TD2.parent / "reviews"
 
 # Fingerprint published in README.md section 4 (seed 20260925).
 README_DB_SHA256 = "0077e235adc2ca647b484e3083c98a6d7cae3ef3655ce366a299caf13398fec2"
@@ -460,6 +461,31 @@ def check_skeleton_sync(report):
                     "atelier-vote.py only exercises the td2 one")
 
 
+# A review log asserting a reference: "- C01: `792800` cents (7,928.00 EUR)".
+CLAIMED_REFERENCE = re.compile(r"^[-*\s]*\**(C\d{2})\**\s*:\s*`?([\d,]+)`?\s*cents", re.M)
+
+
+def check_review_claims(report):
+    """A cross-check log may not assert a reference value the reference file contradicts.
+
+    Only lines of the form "Cnn: <number> cents" count as an assertion. Quoted lines
+    (blockquotes) are skipped, so a correction note may cite the figure it corrects.
+    """
+    published = {case: int(row["revenue_cents"]) for case, row in load_reference().items()}
+    wrong = []
+    for path in sorted(REVIEWS.glob("*.md")):
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if line.lstrip().startswith(">"):
+                continue
+            for case, raw in CLAIMED_REFERENCE.findall(line):
+                value = int(raw.replace(",", ""))
+                if case in published and value != published[case]:
+                    wrong.append(f"{path.name} {case}: claims {value}, reference {published[case]}")
+    report.add("review_claims", not wrong,
+               f"every reference asserted in reviews/ matches reference-td1.csv"
+               if not wrong else f"{len(wrong)} contradicted: {wrong[:4]}")
+
+
 def check_sql_evidence(report, sandbox):
     """Re-run Pair B's delta SQL and compare every figure quoted in the report."""
     statements = sql_statements(PAIR_B_SQL)
@@ -549,6 +575,7 @@ def main():
     check_quorum_matrix(report, matrix)
     check_pair_a_vote(report, cells, matrix)
     check_skeleton_sync(report)
+    check_review_claims(report)
     check_sql_evidence(report, sandbox)
     check_sql_verbatim(report, cells)
     check_pair_c_rates(report, cells)

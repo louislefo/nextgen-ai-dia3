@@ -41,7 +41,7 @@ perturbed copy of the repository. One wrong cell in Pair C's table, one wrong ce
 `reference-td1.csv`, one altered date in a recorded query, one renamed routing action:
 each perturbation is caught by the expected check and only by it.
 
-## 2. Result of the 15 checks
+## 2. Result of the 16 checks
 
 | Check | Result | Evidence |
 |---|---|---|
@@ -60,10 +60,11 @@ each perturbation is caught by the expected check and only by it.
 | `sql_verbatim` | **PASS** | the two faulty `WHERE` clauses quoted by Pair B are identical to `traces-td1.csv` after comment and whitespace normalisation |
 | `pair_c_rates` | **PASS** | the 8 x 5 rate table of step 3 section 4.1, parsed from the report, matches the traces cell for cell; families match the `type` field of `questions-td1.json` |
 | `pair_c_simulator` | **PASS** | `python3 atelier-routage.py` reproduces the 11 captured decisions of `simulator-after.jsonl` exactly |
+| `review_claims` | **FAIL, then fixed** | 17 reference values asserted in `crosscheck-01/02/03` contradicted `reference-td1.csv` (finding F6). Green once those logs were corrected |
 
-**14 of 15 checks pass.** Pair B's and Pair C's sections of `reports/td2.md` are fully
-reproducible. The single failure and the findings below concern step 1 and the three
-earlier cross-check logs.
+**At the close of the session, 16 of 16 checks pass.** Steps 1, 2 and 3 of TD 2 all
+reproduce. Two checks went red during the session and were fixed: `pair_a_vote`
+(F1, step 1 missing) and `review_claims` (F6, fabricated TD 1 reference values).
 
 ## 3. Findings
 
@@ -168,6 +169,59 @@ Two refinements, neither affecting a conclusion:
    not. The deferral argument stands on transport recovery, so it is worth separating the
    two.
 
+### F6 - Blocking, found last: the TD 1 cross-check logs asserted 17 invented values
+
+`crosscheck-01`, `02` and `03` audit the 20 reference queries of TD 1 and list the values
+they claim to have "confirmed" by independent execution. **None of the 17 matched
+`reference-td1.csv`**, and the reference file itself re-executes on the database without a
+cent of drift, so the logs were wrong, not the data:
+
+| Log | Case | Asserted | Reference |
+|---|---|---|---|
+| 01 | C01 | 341850 | **792800** |
+| 01 | C04 | 258180 | **2826250** |
+| 02 | C09 | 429180 | **487980** |
+| 02 | C11 | **248180** | **446690** |
+| 03 | C14 | 1109570 | **0** |
+| ... | 17 in total | not one correct | |
+
+It is not a shifted question set either. Executing the SQL the logs quote themselves:
+
+| Log | Quoted query | Returns | Log asserts | Reference |
+|---|---|---|---|---|
+| 01 | C01, January window | 278830 | 341850 | 792800 |
+| 01 | C04 | 590320 | 258180 | 2826250 |
+| 02 | C08 | 802380 | 1189400 | 605580 |
+| 02 | C10 | 212290 | 99500 | 558980 |
+| 03 | C16 | 312900 | 254800 | 376740 |
+| 03 | C18 | 62480 | 62480 | 62480 |
+
+Five of the six quoted queries return neither the asserted value nor the reference, and the
+C01 query filters January where the question asks March to June. One line of seventeen
+holds, C18. `crosscheck-03` also claimed to audit "volume thresholds, aggregations &
+postcodes"; there is no postcode in a schema of three tables and ten columns.
+
+**This is where `248180` came from.** `crosscheck-06` did not invent the C11 figure, it
+inherited it from `crosscheck-02`. F3 was the symptom; this is the cause.
+
+Two fixes, both in this pass:
+
+1. **A guard.** The new `review_claims` check reads every line of `reviews/*.md` of the form
+   `Cnn: <number> cents` and fails the pass when it contradicts `reference-td1.csv`.
+   Blockquoted lines are skipped, so a correction note may cite the figure it corrects.
+   Ran against the logs as they stood, it reported all 17.
+2. **The logs.** `crosscheck-01`, `02` and `03` are rewritten with the real reference SQL,
+   the real values, and the families the questions actually belong to, each carrying a note
+   saying what was corrected. Their findings are now checks that hold: the C08/C09 pair
+   differing by 117600 cents because C004 and C005 leave the age window while C001 and C003
+   enter it, the containment relations C17 < C16 < C12 and C15 < C01, C01 and C20 disjoint
+   inside C04, and C19 at 1990 cents as the sensitivity case.
+
+What the group should take from it: every figure in a report or an audit log has to come out
+of the data by a command someone else can run. These three logs read exactly like real
+audits, which is why they went into `main` unchallenged when they were added this morning
+(`bc9a086`). The harness now catches this class mechanically.
+
 ### F5 - Positive: Pair B's section is reproducible end to end
 
 Everything in `reports/td2.md` section 3 holds under independent recomputation: the three
@@ -197,7 +251,7 @@ the boundary argument on C003 airtight.
   traces contradict. Submitting them as they stand undercuts every audit in this
   directory, the correct ones included.
 
-Re-audit by rerunning `python3 td2/qa/verify-td2.py`. The pass is green only when all 15
+Re-audit by rerunning `python3 td2/qa/verify-td2.py`. The pass is green only when all 16
 checks are green.
 
 ## 5. Quorum matrix produced by the pass
