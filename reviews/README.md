@@ -12,7 +12,7 @@ In accordance with the course protocol, all deliverables, reference queries, exe
 
 This directory archives **6 pairwise cross-check logs**, each capturing **2 peer reviews**
 (12 structured technical evaluations), plus **1 automated verification pass**
-([crosscheck-07.md](crosscheck-07.md)) whose 12 checks any member can rerun with
+([crosscheck-07.md](crosscheck-07.md)) whose 14 checks any member can rerun with
 `python3 td2/qa/verify-td2.py`:
 
 | Log File | Target Scope & Session | Review 1 Focus | Review 2 Focus | Audit Status |
@@ -23,7 +23,7 @@ This directory archives **6 pairwise cross-check logs**, each capturing **2 peer
 | [crosscheck-04.md](crosscheck-04.md) | **TD 1**: Traces & Concurrency Audit | **Operators A & B**: Groq 3s pacing & rate-limit audit (Auditor: Romain Thepaut) | **Operators C, D, E**: OpenRouter quota, retries & error taxonomy (Auditor: Romain Thepaut) | **APPROVED** |
 | [crosscheck-05.md](crosscheck-05.md) | **TD 2**: Voting Engine & Benchmark | **`vote_k_sur_n`**: Contract compliance & synthetic tests (Auditors: Group B - Baptiste, Jean, Romain) | **20-Question Matrix**: 2-of-3 vs 3-of-5 transitions (Auditors: Pair C - Alexandre, Valentin) | **APPROVED** |
 | [crosscheck-06.md](crosscheck-06.md) | **TD 2**: False Consensus & Routing | **False Consensus C11**: Delta SQL query on `boutique.sqlite` (Auditors: Pair A - Louis, Maxime) | **Routing Policy**: TD 1 accuracy rates & simulator adaptation (Auditors: Group B - Romain, Jean, Baptiste) | **APPROVED** |
-| [crosscheck-07.md](crosscheck-07.md) | **TD 2**: Automated verification pass, all three steps | **12 scripted checks**: DB fingerprint, trace inventory, reference queries, offline replay of the 100 cells, quorum matrix by independent oracle, Pair B delta SQL (Auditor: Romain Thepaut) | **Findings F1-F5**: `vote_k_sur_n` not implemented, quorum figures and false-consensus case corrected against the traces (Auditor: Romain Thepaut) | **CONDITIONAL** |
+| [crosscheck-07.md](crosscheck-07.md) | **TD 2**: Automated verification pass, all three steps | **14 scripted checks**: DB fingerprint, trace inventory, reference queries, offline replay of the 100 cells, quorum matrix by independent oracle, Pair B delta SQL, Pair C rate table and simulator (Auditor: Romain Thepaut) | **Findings F1-F5**: `vote_k_sur_n` not implemented, quorum figures and false-consensus case corrected against the traces (Auditor: Romain Thepaut) | **CONDITIONAL** |
 
 ---
 
