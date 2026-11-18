@@ -17,8 +17,12 @@ venv/
 __pycache__/
 *.pyc
 
-# Editor and operating-system files
+# Editor, local tooling and operating-system files
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Local tool working directories: never part of a deliverable
+.claude/
+.worktrees/
