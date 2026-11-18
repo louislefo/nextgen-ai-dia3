@@ -343,3 +343,43 @@ A further reason applies to our data. The free route has TD 1 evidence, and the 
 - 20 questions × 5 models support a **batch-specific hypothesis only**. F2b (C10) and C18 have one cell each, so "100 %" there means 1/1. More age-at-order cells are the first thing to measure.
 - The paid gpt-oss-120b route is assumed to behave like the Groq route measured in TD 1, which is why it always carries a check. The provider's quantisation may differ.
 - **No free model is enough on its own** for customer or payout figures on F2, F2b and their combinations. Only gpt-oss-120b is reliable there, and C09 shows that a free quorum can agree on a wrong value. These families set the **price of checking** for TD 3: one reference query (≈0 cost) or a human review per figure.
+
+---
+
+## 5. Sub-Group Team Contributions
+
+In accordance with the collaborative protocol defined for TD 2, the workload was systematically partitioned among three specialized engineering pairs:
+
+| Pair / Group | Members (Roster) | Assigned Step & Domain | Technical Contributions & Key Deliverables Completed |
+|---|---|---|---|
+| **Pair A** | **Louis Le Forestier** (Lead)<br>**Maxime Laurent** (Co-Lead) | **Step 1**: Consensus Engineering | - Architected and implemented `Orchestrateur.vote_k_sur_n` in `td2/skeleton-multi-llm-en.py` (and synchronized in `td1/skeleton-multi-llm-en.py`).<br>- Enforced strict majority threshold validation ($\lfloor n/2 \rfloor < k \le n$), proposal deduplication, and error retention in $n$.<br>- Validated engine across all four synthetic test cases (`atelier-vote.py`) and single-case trace runner.<br>- Generated the complete 20-question comparison matrix (2-of-3 vs 3-of-5) in `td2/pair-a/voting-tests-en.csv` and Section 2.<br>- Conducted in-depth transition analysis: documented how 3-of-5 quorum suppresses the false consensus on C09 and recovers true consensus on C19. |
+| **Group B** | **Baptiste Noailhac**<br>**Jean Jaunet**<br>**Romain Thepaut** | **Step 2**: SQL Diagnostics & Evidence Auditing | - Exhaustively audited the 100 TD 1 cells for shared incorrect values, identifying C09, C02, and C10.<br>- Dissected root-cause SQL logic flaws on C09 (`birth_year` without 2026 subtraction vs contradictory date window).<br>- Developed and executed the delta diagnostic query on `data/boutique.sqlite`, isolating 6 customer records and reconciling the entire 487,980-cent gap.<br>- Documented the non-zero false consensus on C10 and analyzed the SQLite timestamp comparison quirk on `DEMO-VOTE`.<br>- Hand-verified quorum vote counts and cross-checked against Pair A's automated outputs. |
+| **Pair C** | **Alexandre Jullien Gaildraud**<br>**Valentin Gourmelon** | **Step 3**: Dynamic Routing & Simulation | - Derived the 8x5 empirical accuracy rate matrix across question families directly from `traces-td1.csv`.<br>- Authored the 1-page dynamic routing policy establishing lowest-cost eligible dispatch and risk-tiered checks.<br>- Adapted `atelier-routage.py` with portfolio pricing and empirical TD 1 cell justification strings.<br>- Executed and logged 11 simulation scenarios (`simulator-before.jsonl` vs `simulator-after.jsonl`).<br>- Analytically justified the queue priority order in `choose` (subscription allocation vs free refill deferral) and identified condition inversion criteria. |
+
+---
+
+## 6. Key Takeaways, Limitations & Preparation for TD 3
+
+### 6.1 Experimental Takeaways
+1. **Consensus Is Not Correctness**: Two distinct model architectures (`cohere/north-mini-code:free` and `qwen/qwen3.8-27b`) can generate completely different invalid SQL queries that both produce `0` because empty relational filters converge on `COALESCE(SUM(...), 0)`. Agreement on zero is weak evidence.
+2. **Quorum Filtering Dynamics**: Expanding the quorum from 2-of-3 to 3-of-5 eliminated 100% of false consensus cases in our batch (converting C09 into a safe abstention) and recovered true consensus on C19 (`1,990` cents). However, an abstention provides no operational answer, proving that high-stakes questions require external verification.
+3. **The Price of Checking**: For question families involving completed customer age ($F2$, $F2b$), only `openai/gpt-oss-120b` achieved 100% reliability in TD 1. Because free quorums can fail collectively, figures exposed to customers or financial payouts strictly require deterministic reference checks (local SQL queries) or human sign-off.
+
+### 6.2 Actionable Roadmap for TD 3 (Quantification & Architectural Decision)
+- **Configuration Benchmarking**: Quantify five production serving configurations across the 20 benchmark questions:
+  1. *Cheapest Single Model*: Lowest-cost eligible model per question family.
+  2. *Best Single Model Overall*: Standalone `openai/gpt-oss-120b`.
+  3. *Fixed 2-of-3 Panel*: Majority voting across the three designated models ($k=2$).
+  4. *Full 3-of-5 Quorum*: Majority voting across all five models ($k=3$).
+  5. *Subgroup Dynamic Routing Policy*: Multi-tier adaptive routing rule with failover and abstention.
+- **Dual-Column Cost Accounting**: Compute total token costs based on official portfolio pricing (`portefeuille-modeles-2026-09-28.csv`) alongside actual cash spend (0 USD for free routes).
+- **Production Use Case & Pitch Deck**: Formalize an operational business deployment (Internal Dashboard vs Customer Display vs Financial Payout) and prepare the 3-slide presentation deck for table evaluation on 11 December 2026.
+
+### 6.3 Hand-in & Reproducibility Checklist
+- [x] `skeleton-multi-llm-en.py` with `vote_k_sur_n` fully implemented and passing all tests.
+- [x] 20-question comparison matrix (2-of-3 vs 3-of-5) verified against `reference-td1.csv`.
+- [x] Shared false consensus C09 verified on `data/boutique.sqlite` with executable delta query.
+- [x] 1-page routing policy with 8x5 empirical rate table and adapted simulator outputs.
+- [x] All 15 offline verification checks passing in `td2/qa/verify-td2.py`.
+- [x] Complete session report published in `reports/td2.md`.
+
