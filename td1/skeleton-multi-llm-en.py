@@ -624,7 +624,51 @@ class Orchestrateur:
         families, and look in your traces for a case where several models agree
         on a wrong value.
         """
-        raise NotImplementedError("vote_k_sur_n: to implement in TD 2 (see the procedure in the docstring).")
+        n = len(traces_question)
+        if not (n // 2 < k <= n):
+            raise ValueError(f"k={k} is not a strict majority for n={n} (must satisfy {n // 2} < k <= {n})")
+
+        seen_models = set()
+        for p in traces_question:
+            provider = p["provider"] if isinstance(p, dict) else getattr(p, "provider", None)
+            model = p["model_requested"] if isinstance(p, dict) else getattr(p, "model_requested", None)
+            pair = (provider, model)
+            if pair in seen_models:
+                raise ValueError(f"Duplicate proposal for provider and model: {pair}")
+            seen_models.add(pair)
+
+        from collections import defaultdict
+        value_votes = defaultdict(int)
+        value_models = defaultdict(list)
+
+        for p in traces_question:
+            verdict = p["verdict"] if isinstance(p, dict) else getattr(p, "verdict", None)
+            val = p["value"] if isinstance(p, dict) else getattr(p, "value", None)
+            provider = p["provider"] if isinstance(p, dict) else getattr(p, "provider", None)
+            model = p["model_requested"] if isinstance(p, dict) else getattr(p, "model_requested", None)
+
+            if verdict == "executed" and val is not None:
+                model_str = f"{provider}:{model}"
+                value_votes[val] += 1
+                value_models[val].append(model_str)
+
+        max_votes = max(value_votes.values()) if value_votes else 0
+
+        for val, count in value_votes.items():
+            if count >= k:
+                return {
+                    "consensus": True,
+                    "value": val,
+                    "votes": count,
+                    "models": value_models[val],
+                }
+
+        return {
+            "consensus": False,
+            "value": None,
+            "votes": max_votes,
+            "models": [],
+        }
 
 
 # ==========================================================================
