@@ -384,7 +384,7 @@ Across the 20 benchmark questions:
 | **Jean Jaunet** | Pair B (Diagnostics) | SQL Delta Analysis | Executable delta SQL queries on `boutique.sqlite`, cent reconciliation (487,980 cts) | Baptiste Noailhac & Pair A |
 | **Alexandre Jullien Gaildraud**| Pair C (Routing) | Routing Policy | 1-page rule, empirical TD 1 accuracy mapping per family, checking tiers | Valentin Gourmelon & Group B |
 | **Valentin Gourmelon** | Pair C (Routing) | Simulator Adaptation | `atelier-routage.py` (`RESOURCES` & `choose`), `simulator-after.jsonl`, queue priority analysis | Alexandre Jullien Gaildraud & Pair A |
-| **Romain Thepaut** | QA & Verification | Automated Test Harness | `td2/qa/verify-td2.py` (12/12 automated checks), `reviews/crosscheck-07.md` | Whole Sub-group |
+| **Romain Thepaut** | QA & Verification | Automated Test Harness | `td2/qa/verify-td2.py` (15/15 automated checks), `reviews/crosscheck-07.md` | Whole Sub-group |
 
 ### 6.2 Pre-Submission Verification Checklist
 
@@ -395,9 +395,13 @@ Prior to final submission, the entire deliverable suite was validated offline us
 - [x] **`reference_queries`**: All 20 SQL reference queries verified on SQLite, reproducing all values.
 - [x] **`pair_a_vote`**: Strict majority check, duplicate refusal, and all 40 quorum decisions match the independent oracle.
 - [x] **`skeleton_sync`**: `vote_k_sur_n` identical between `td1/skeleton-multi-llm-en.py` and `td2/skeleton-multi-llm-en.py`.
+- [x] **`offline_replay`**: the recorded SQL of all 100 cells re-executed read-only; 96 values reproduced to the cent, the 4 non-executed cells still refused.
+- [x] **`quorum_2of3` / `quorum_3of5`**: 17/20 consensus each, 16 correct versus 17, the single wrong consensus on C09, abstentions C10/C17/C19 and C09/C10/C17.
+- [x] **`shared_wrong_values`**: the search over the 100 cells returns exactly C02, C09 and C10, so no shared wrong value was missed.
+- [x] **`pair_c_rates`**: the 8 x 5 rate table of section 4.1 matches the traces cell for cell, families taken from `questions-td1.json`.
 - [x] **`sql_evidence`**: Statements in `td2/pair-b/step2-wrong-consensus.sql` re-executed; 487,980 cts reconciliation verified.
 - [x] **`pair_c_simulator`**: `atelier-routage.py` reproduces all 11 decisions in `simulator-after.jsonl`.
-- [x] **Automated Harness Pass**: `python td2/qa/verify-td2.py` reports **12/12 PASS**.
+- [x] **Automated Harness Pass**: `python3 td2/qa/verify-td2.py` reports **15/15 PASS** (exit code 0).
 
 ### 6.3 Hand-in Metadata
 - **Repository URL**: `https://github.com/louislefo/nextgen-ai-dia3.git`
