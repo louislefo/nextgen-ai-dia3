@@ -98,15 +98,16 @@
     </div>
 
     <div class="card">
-      <div class="pill">In Preparation</div>
+      <div class="pill">Completed</div>
       <h3 class="card-title"><a href="td2.html">TD 2: Quorum Consensus &amp; Routing Rules</a></h3>
-      <p>Implementation of <code>vote_k_sur_n</code> majority voting consensus and rule-based request routing based on query complexity.</p>
+      <p><code>vote_k_sur_n</code> majority voting and a routing policy derived from measured per-family accuracy, run entirely offline on the TD 1 traces.</p>
       <ul>
-        <li>Majority voting across heterogeneous model panels</li>
-        <li>Abstention protocols when models diverge</li>
-        <li>Dynamic routing policy tested across 7 difficulty scenarios in <code>atelier-routage.py</code></li>
+        <li>Both quorums reach consensus on 17/20 questions; the 2-of-3 panel published one wrong figure, on C09</li>
+        <li>Wrong consensus proven in SQL: two unrelated bugs converge on <code>0</code>, gap reconciled to the cent</li>
+        <li>Routing policy on an 8&times;5 empirical rate table, 11 simulated scenarios in <code>atelier-routage.py</code></li>
+        <li>16/16 offline verification checks passing in <code>td2/qa/verify-td2.py</code></li>
       </ul>
-      <p><a href="td2.html">Explore TD 2 Architecture &rarr;</a></p>
+      <p><a href="td2.html">Explore TD 2 Results &rarr;</a></p>
     </div>
 
     <div class="card">

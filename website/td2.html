@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="TD 2 Majority Voting Consensus and Dynamic Routing Architecture - ESILV DIA 3">
+  <meta name="description" content="TD 2 results: k-of-n quorum, wrong consensus on C09, empirical routing policy - ESILV DIA 3">
   <title>TD 2: Quorum Consensus &amp; Dynamic Routing | ESILV DIA 3</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -35,95 +35,341 @@
 
 <main>
   <div class="meta-bar">
-    <span>Module: TD 2 Architecture</span>
+    <span>Session: 2026-11-18</span>
     <span>Consensus: k-of-n Quorum</span>
-    <span>Routing: Difficulty-Aware Dispatch</span>
-    <span>Status: In Preparation</span>
+    <span>Routing: Empirical per Family</span>
+    <span>Status: Completed</span>
   </div>
 
   <h1>TD 2: Majority Voting Consensus &amp; Dynamic Routing</h1>
   <p class="lead">
-    Designing robust decision mechanisms for production AI systems: combining multi-model voting quorums for critical queries with dynamic rule-based model routing to minimize operational costs.
+    Two decision systems built on the TD 1 traces, entirely offline: a <em>k</em>-of-<em>n</em> voting quorum and a
+    routing policy derived from measured per-family accuracy. The central result is negative and it is the
+    point of the session: on question C09 a 2-of-3 panel agreed on a wrong figure.
   </p>
 
-  <aside class="notice final">
-    <p><strong>Building on TD 1 Empirical Findings</strong></p>
-    <p>TD 1 revealed that lightweight models achieve near-perfect accuracy (96.7% to 100%) on timestamp and product filters, but drop to 60.0% on completed age arithmetic. TD 2 exploits this gap to build an automated, cost-optimal system.</p>
-  </aside>
-
-  <h2>1. Pillar 1: Majority Voting Consensus (<em>k</em>-of-<em>n</em> Quorum)</h2>
-  <p>
-    When a database query carries operational or financial consequences, trusting a single probabilistic model draw is unacceptable. The voting consensus mechanism operates as follows:
-  </p>
-
-  <div class="cards">
-    <div class="card">
-      <div class="pill">Mechanism</div>
-      <h3 class="card-title">Parallel Panel Querying</h3>
-      <p>A query is simultaneously dispatched to <em>n</em> distinct models (e.g., <em>n</em> = 3 or 5). To ensure true independence, the panel must not reuse duplicate backend providers or shared model families.</p>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-value">17/20</div>
+      <div class="stat-label">Consensus reached</div>
+      <div class="stat-sub">Identical for both quorums</div>
     </div>
-    <div class="card">
-      <div class="pill">Verification</div>
-      <h3 class="card-title">Sandboxed Execution &amp; Value Matching</h3>
-      <p>Model SQL queries are executed independently in the SQLite read-only sandbox. Votes are cast on the <em>computed numerical revenue</em> (<code>revenue_cents</code>), not on verbatim SQL string similarity.</p>
+    <div class="stat-card">
+      <div class="stat-value">1</div>
+      <div class="stat-label">Wrong consensus, 2-of-3</div>
+      <div class="stat-sub">C09, value 0 against 487,980 cts</div>
     </div>
-    <div class="card">
-      <div class="pill">Safety Guardrail</div>
-      <h3 class="card-title">Quorum Threshold &amp; Abstention</h3>
-      <p>If at least <em>k</em> models agree on the identical value (e.g., 2 out of 3, or 3 out of 5), that value is accepted. Otherwise, the system safely <strong>abstains</strong> rather than outputting a hallucinated figure.</p>
+    <div class="stat-card">
+      <div class="stat-value">0</div>
+      <div class="stat-label">Wrong consensus, 3-of-5</div>
+      <div class="stat-sub">Suppressed by abstention, not by a better answer</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">16/16</div>
+      <div class="stat-label">Verification checks passing</div>
+      <div class="stat-sub"><code>python3 td2/qa/verify-td2.py</code>, exit 0</div>
     </div>
   </div>
 
-  <h2>2. Pillar 2: Dynamic Difficulty Routing</h2>
+  <aside class="notice final">
+    <p><strong>Every figure on this page is re-derivable offline</strong></p>
+    <p>
+      The two sources of truth are <code>td2/traces-td1.csv</code> (104 rows, 100 cells, all real) and
+      <code>td2/data/boutique.sqlite</code> (SHA-256 <code>0077e235adc2ca64…</code>). The recorded SQL of all 100
+      cells was re-executed read-only: 96 values reproduce to the cent and the 4 non-executed cells are still
+      refused by the sandbox. No API key, no network, no credit spent.
+    </p>
+  </aside>
+
+  <h2>1. The central finding: agreement is not correctness</h2>
   <p>
-    Instead of sending all questions to expensive frontier models, a pre-inference rule inspects request complexity and selects the cheapest model capable of reliable answering:
+    Question C09 asks for revenue excluding VAT, in cents, from customers aged exactly 25 on 2026-09-26.
+    The reference is <strong>487,980</strong> cents, established by peer-audited SQL and confirmed by a second,
+    independent arithmetic method. The fixed 2-of-3 panel published <strong>0</strong>.
   </p>
 
   <div class="tableau">
     <table>
       <thead>
         <tr>
-          <th>Query Complexity Tier</th>
-          <th>Question Characteristics</th>
-          <th>Routing Decision</th>
-          <th>Economic Rationale</th>
+          <th>Model</th>
+          <th>Value returned</th>
+          <th>Verdict</th>
+          <th>Vote in the 2-of-3 panel</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td><strong>Tier 1: Simple Period / Product</strong></td>
-          <td>Orders between dates, product categories (C01, C03, C04, C05, C07, C12, C13, C20).</td>
-          <td>Route to <strong>Tier 1 Compact Model</strong> (e.g., GPT-OSS 20B or Dots).</td>
-          <td>Near 100% accuracy at zero / minimal token cost.</td>
+          <td><code>openai/gpt-oss-120b</code> (Groq)</td>
+          <td>487,980 cts</td>
+          <td><span class="badge ok">correct</span></td>
+          <td>Panel member</td>
         </tr>
         <tr>
-          <td><strong>Tier 2: Complex Boundary / Age</strong></td>
-          <td>Exact completed age at order time or reference date (C02, C08-C11, C15-C19).</td>
-          <td>Route to <strong>Frontier Model</strong> (GPT-120B) OR <strong>3-Model Voting Panel</strong>.</td>
-          <td>Prevents severe calendar date miscalculations identified in TD 1.</td>
+          <td><code>cohere/north-mini-code:free</code></td>
+          <td>0 cts</td>
+          <td><span class="badge error">incorrect</span></td>
+          <td>Panel member</td>
+        </tr>
+        <tr>
+          <td><code>qwen/qwen3.8-27b</code> (Groq)</td>
+          <td>0 cts</td>
+          <td><span class="badge error">incorrect</span></td>
+          <td>Panel member</td>
+        </tr>
+        <tr>
+          <td><code>openai/gpt-oss-20b</code> (Groq)</td>
+          <td>487,980 cts</td>
+          <td><span class="badge ok">correct</span></td>
+          <td>Outside the panel</td>
+        </tr>
+        <tr>
+          <td><code>dots-3-note-preview:free</code></td>
+          <td>no value</td>
+          <td><span class="badge warning">sql_rejected</span></td>
+          <td>Outside the panel, stays in <em>n</em>, casts no vote</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <h2>3. TD 2 Workshop Modules</h2>
+  <div class="cards">
+    <div class="card">
+      <div class="pill">Bug 1</div>
+      <h3 class="card-title">Cohere: the age that is a birth year</h3>
+      <p>
+        Its age expression is <code>CAST(SUBSTR(birth_date,1,4) AS INTEGER)</code> minus a 0-or-1 correction,
+        which is the <strong>birth year</strong>, around 2000 to 2001. It never subtracts from 2026, so
+        <code>… = 25</code> is false for every customer and the filter keeps no row.
+      </p>
+    </div>
+    <div class="card">
+      <div class="pill">Bug 2</div>
+      <h3 class="card-title">Qwen: a contradictory window</h3>
+      <p>
+        It compares against <code>o.date</code> instead of the reference date, then writes
+        <code>strftime('%m-%d', date(birth_date, '+26 years'))</code>, which returns the birth month-day again.
+        The condition becomes <em>md &ge; birth_md AND md &lt; birth_md</em>, a contradiction. Zero rows again.
+      </p>
+    </div>
+    <div class="card">
+      <div class="pill">Why they agree</div>
+      <h3 class="card-title"><code>0</code> is an attractor, not a coincidence</h3>
+      <p>
+        Any empty filter wrapped in <code>COALESCE(SUM(…), 0)</code> returns <code>0</code>. Two unrelated bugs
+        converge on the same plausible figure <strong>without sharing any reasoning</strong>. Agreement on zero
+        is therefore weak evidence by construction, and deserves a row-count check before publication.
+      </p>
+    </div>
+  </div>
+
+  <h2>2. What widening the panel actually buys</h2>
+  <p>
+    Moving from a 2-of-3 panel (<em>k</em> = 2) to the full 3-of-5 quorum (<em>k</em> = 3) changes
+    <strong>two cells out of twenty</strong>. Automation rate is identical; one error is removed.
+  </p>
+
+  <div class="tableau">
+    <table>
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>2-of-3 panel</th>
+          <th>3-of-5 quorum</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Consensus reached</td><td>17 / 20</td><td>17 / 20</td></tr>
+        <tr><td>Correct when consensus reached</td><td>16 / 17</td><td>17 / 17</td></tr>
+        <tr><td>Wrong consensus</td><td><span class="badge error">1 (C09)</span></td><td><span class="badge ok">0</span></td></tr>
+        <tr><td>Abstentions</td><td>3 (C10, C17, C19)</td><td>3 (C09, C10, C17)</td></tr>
+        <tr><td>Unanimous decisions</td><td>10</td><td>10</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="pill">C09</div>
+      <h3 class="card-title">Wrong consensus &rarr; abstention</h3>
+      <p>
+        The fourth model votes 487,980 and Dots is rejected, so the tally is 2-2, below <em>k</em> = 3. The
+        quorum <strong>abstains</strong>. Safety here comes from refusing to answer, not from finding the right
+        answer. A third model sharing the <code>0</code> would have carried the wrong value to <em>k</em> = 3.
+      </p>
+    </div>
+    <div class="card">
+      <div class="pill">C19</div>
+      <h3 class="card-title">Abstention &rarr; correct consensus</h3>
+      <p>
+        The panel split 1-1-1 (1,990 / 83,580 / 13,930) and abstained. Two more models vote 1,990, reaching 3
+        votes. At 1,990 cents C19 is the smallest non-zero reference of the benchmark, so a dropped predicate
+        overshoots it sevenfold or forty-twofold rather than slightly.
+      </p>
+    </div>
+    <div class="card">
+      <div class="pill">C10</div>
+      <h3 class="card-title">A shared wrong value that wins nothing</h3>
+      <p>
+        Qwen and Dots both return 119,410 against a reference of 558,980, but <strong>neither quorum validates
+        it</strong>: the panel splits 1-1-1 and the quorum ties 2-2. The delta is 28 order lines worth 439,570
+        cents, placed before the birthday in the year of the customer's 26th birthday.
+      </p>
+    </div>
+  </div>
+
+  <h2>3. SQL proof: the gap reconciled to the cent</h2>
+  <p>
+    Both faulty C09 queries keep zero rows, so the whole reference population is the delta. Executed read-only
+    on <code>boutique.sqlite</code> (<code>td2/pair-b/step2-wrong-consensus.sql</code>):
+  </p>
+
+  <div class="tableau">
+    <table>
+      <thead>
+        <tr><th>customer_id</th><th>birth_date</th><th>Orders</th><th>Revenue (cents)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>C007</td><td>2000-11-30</td><td>6</td><td>118,740</td></tr>
+        <tr><td>C009</td><td>2001-03-10</td><td>5</td><td>61,330</td></tr>
+        <tr><td>C008</td><td>2001-05-15</td><td>7</td><td>99,090</td></tr>
+        <tr><td>C002</td><td>2001-09-24</td><td>3</td><td>25,920</td></tr>
+        <tr><td>C001</td><td>2001-09-25</td><td>8</td><td>135,000</td></tr>
+        <tr><td>C003</td><td>2001-09-26</td><td>4</td><td>47,900</td></tr>
+        <tr><td colspan="3"><strong>Total</strong></td><td><strong>487,980 = 487,980 &minus; 0</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    C003, born exactly 2001-09-26 and turning 25 that day, sits on the inclusive boundary: it is the row a
+    strict <code>&lt;</code> would silently drop. Three independent methods agree on 487,980: the peer-audited
+    reference, this delta total, and a separate arithmetic age computation with no date window.
+  </p>
+
+  <h2>4. Routing policy, derived from measured accuracy</h2>
+  <p>
+    Eligibility is not assumed, it is read off the TD 1 cells per question family, with the families taken from
+    <code>questions-td1.json</code>. A rate-limited call counts as a miss, which is why Qwen is 5/6 on simple
+    periods and therefore not eligible there.
+  </p>
+
+  <div class="tableau">
+    <table>
+      <thead>
+        <tr>
+          <th>Family</th>
+          <th>Cells</th>
+          <th>gpt-oss-120b</th>
+          <th>gpt-oss-20b</th>
+          <th>qwen3.8-27b</th>
+          <th>north-mini-code</th>
+          <th>dots-3-note</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>F1</strong> period</td><td>6</td><td>6/6</td><td>6/6</td><td>5/6</td><td>6/6</td><td>6/6</td></tr>
+        <tr><td><strong>F2</strong> age on a date</td><td>4</td><td>4/4</td><td>2/4</td><td>3/4</td><td><span class="badge error">0/4</span></td><td>3/4</td></tr>
+        <tr><td><strong>F2b</strong> age at the order</td><td>1</td><td>1/1</td><td>1/1</td><td>0/1</td><td>0/1</td><td>0/1</td></tr>
+        <tr><td><strong>F3</strong> product list</td><td>4</td><td>4/4</td><td>4/4</td><td>4/4</td><td>4/4</td><td>4/4</td></tr>
+        <tr><td>F1+F2+F3 and other combinations</td><td>5</td><td>5/5</td><td>5/5</td><td>1/5</td><td>3/5</td><td>2/5</td></tr>
+        <tr><td><strong>Total</strong></td><td>20</td><td><span class="badge ok">20/20</span></td><td>18/20</td><td>13/20</td><td>13/20</td><td>15/20</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tableau">
+    <table>
+      <thead>
+        <tr>
+          <th>Family</th>
+          <th>First model called</th>
+          <th>Internal dashboard</th>
+          <th>Figure shown to a customer</th>
+          <th>Amount paid out</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>F1 period</td>
+          <td><code>gpt-oss-20b</code> (6/6)</td>
+          <td>no check</td>
+          <td>2-of-3 quorum of eligible free models</td>
+          <td>3-of-5 quorum <em>and</em> reference query</td>
+        </tr>
+        <tr>
+          <td>F3 product list</td>
+          <td><code>qwen3.8-27b</code> (4/4)</td>
+          <td>no check</td>
+          <td>2-of-3 quorum, all five qualify</td>
+          <td>3-of-5 quorum <em>and</em> reference query</td>
+        </tr>
+        <tr>
+          <td>F2, F2b and combinations</td>
+          <td><code>gpt-oss-120b</code> only</td>
+          <td>no check + zero-value guard</td>
+          <td>deterministic reference query, abstain on mismatch</td>
+          <td>reference query <em>and</em> human sign-off</td>
+        </tr>
+        <tr>
+          <td>Unknown family, no TD 1 cell</td>
+          <td colspan="4"><strong>abstain</strong>: no evidence, no answer</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <aside class="notice">
+    <p><strong>The price of checking, carried into TD 3</strong></p>
+    <p>
+      No free model is sufficient on its own for age families. Only <code>gpt-oss-120b</code> reached 20/20, and
+      C09 shows that a free quorum can agree on a wrong figure while 3-of-5 only abstains. So a customer-facing
+      or payout figure costs either one deterministic reference query (local route, 0 USD) or a paid fallback at
+      <strong>0.000711 USD per request</strong> (<code>gpt-oss-120b</code> on OpenRouter, 0.15 / 0.60 USD per M
+      tokens, 641 in / 1,024 out), plus human sign-off on payouts.
+    </p>
+  </aside>
+
+  <h2>5. Workshop modules and verification</h2>
   <div class="cards">
     <div class="card">
       <h3 class="card-title"><code>atelier-vote.py</code></h3>
-      <p>Harness for testing the quorum voting algorithm across four key operational edge cases:</p>
+      <p>Drives <code>Orchestrateur.vote_k_sur_n</code> on four synthetic examples and on the stored traces of any single question. The contract it enforces:</p>
       <ul>
-        <li><strong>Consensus agreement:</strong> Models return matching values; quorum met.</li>
-        <li><strong>Consensus disagreement:</strong> Models diverge; verified safe abstention.</li>
-        <li><strong>Provider outage (HTTP 429/timeout):</strong> Graceful quorum degradation.</li>
-        <li><strong>Duplicate routes:</strong> Detecting and rejecting false consensus from duplicate models.</li>
+        <li><strong>Strict majority:</strong> <code>n // 2 &lt; k &le; n</code>, else <code>ValueError</code>.</li>
+        <li><strong>No duplicate weight:</strong> two proposals from the same <code>(provider, model)</code> are refused.</li>
+        <li><strong>Errors stay in <em>n</em>:</strong> an unavailable member cannot shrink the denominator.</li>
+        <li><strong>No fabrication:</strong> below quorum the return is <code>value: None</code>.</li>
       </ul>
     </div>
-
     <div class="card">
       <h3 class="card-title"><code>atelier-routage.py</code></h3>
-      <p>Benchmarking harness evaluating the routing rule against seven distinct real-world traffic scenarios, balancing accuracy against total API expenditure.</p>
+      <p>
+        Eleven scenarios, from the seven supplied to four added for our own rule, each deciding
+        <code>run</code>, <code>defer</code> or <code>abstain</code> with the TD 1 cells cited in the reason.
+        The captured outputs in <code>td2/pair-c/</code> reproduce decision for decision from the committed code.
+      </p>
+    </div>
+    <div class="card">
+      <h3 class="card-title"><code>td2/qa/verify-td2.py</code></h3>
+      <p>
+        Sixteen offline checks that re-derive every published figure from the traces and the database, with a
+        vote oracle written independently of the implementation it audits. Exit code 1 on any failure, so it can
+        gate a submission. Each check was also run against a deliberately perturbed copy of the repository to
+        confirm it fails when a figure moves.
+      </p>
     </div>
   </div>
+
+  <aside class="notice">
+    <p><strong>Limitations we state rather than hide</strong></p>
+    <p>
+      Twenty questions across five models support a <em>batch-specific</em> hypothesis, not a general error rate.
+      F2b rests on a single cell, so "100%" there means 1/1. The 3-of-5 quorum reached 100% precision on this
+      batch because one extra model happened to be correct on C09 and another happened to be rejected; the
+      measured claim is that widening the panel suppressed this error, not that a quorum cannot produce a wrong
+      consensus.
+    </p>
+  </aside>
 </main>
 
 <footer>
