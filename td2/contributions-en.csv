@@ -1,0 +1,8 @@
+member,work_item,file_and_location,cross_checked_by,date
+Louis Le Forestier,Quorum Voting Engine (vote_k_sur_n),td2/skeleton-multi-llm-en.py,Maxime Laurent,2026-11-18
+Maxime Laurent,Quorum Benchmark & Matrix Analysis,reports/td2.md (Section 2),Louis Le Forestier,2026-11-18
+Baptiste Noailhac,Trace Audit & False Consensus Identification,td2/pair-b/step2-report-section.md,Jean Jaunet,2026-11-18
+Jean Jaunet,SQL Delta Diagnostics & SQLite Execution,td2/pair-b/step2-wrong-consensus.sql,Baptiste Noailhac,2026-11-18
+Alexandre Jullien Gaildraud,Empirical Routing Policy Formulation,reports/td2.md (Section 4),Valentin Gourmelon,2026-11-18
+Valentin Gourmelon,Simulator Adaptation & Queue Priority Analysis,td2/atelier-routage.py,Alexandre Jullien Gaildraud,2026-11-18
+Romain Thepaut,Automated QA Test Harness & Audit Log,td2/qa/verify-td2.py,Whole Sub-group,2026-11-18

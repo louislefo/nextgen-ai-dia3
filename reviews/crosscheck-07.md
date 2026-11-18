@@ -4,8 +4,8 @@
 **Session**: TD 2 - Quorum Voting, False Consensus & Routing
 **Auditor**: Romain Thepaut (QA, Audit & Verification)
 **Review Date**: 2026-11-18
-**Target Scope**: `td2/skeleton-multi-llm-en.py`, `td2/atelier-vote.py`, `td2/atelier-routage.py`, `td2/pair-b/`, `reports/td2.md`, `reviews/crosscheck-05.md`, `reviews/crosscheck-06.md`
-**Repository State**: commit `aab2814` (merge of PR #11)
+**Target Scope**: `td2/skeleton-multi-llm-en.py`, `td2/atelier-vote.py`, `td2/atelier-routage.py`, `td2/pair-b/`, `td2/pair-c/`, `reports/td2.md`, `reviews/crosscheck-05.md`, `reviews/crosscheck-06.md`
+**Repository State**: commit `ce2b612` (Pair C step 3, PR #13/#14). Findings F1 to F3 were first raised at `aab2814`, before step 3 landed; F4 is restated against `ce2b612`.
 
 ---
 
@@ -32,8 +32,16 @@ Properties of the harness:
   (20 questions x 2 quorums) plus the three contract failure modes.
 - **Decision before scoring**: the reference is never passed to the vote; correctness is
   compared after the decision, as `atelier-vote.py` requires.
+- **No restated figures**: Pair C's rate table is parsed out of
+  `td2/pair-c/step3-report-section.md` and compared cell by cell to the traces, so the
+  harness audits the published document rather than a copy of it.
 
-## 2. Result of the 12 checks
+A check that cannot fail proves nothing, so each one was run against a deliberately
+perturbed copy of the repository. One wrong cell in Pair C's table, one wrong cent in
+`reference-td1.csv`, one altered date in a recorded query, one renamed routing action:
+each perturbation is caught by the expected check and only by it.
+
+## 2. Result of the 15 checks
 
 | Check | Result | Evidence |
 |---|---|---|
@@ -46,12 +54,16 @@ Properties of the harness:
 | `shared_wrong_values` | **PASS** | exactly C02 (0), C09 (0), C10 (119410), with the model pairs stated in `reports/td2.md` |
 | `quorum_2of3` | **PASS** | 17/20 consensus, 1 wrong (C09 = 0), abstentions C10, C17, C19 |
 | `quorum_3of5` | **PASS** | 17/20 consensus, 0 wrong, abstentions C09, C10, C17 |
-| `pair_a_vote` | **FAIL** | `Orchestrateur.vote_k_sur_n` raises `NotImplementedError` (finding F1) |
+| `pair_a_vote` | **FAIL** | `Orchestrateur.vote_k_sur_n` raises `NotImplementedError` (finding F1; green on the step 1 branch of PR #16) |
+| `skeleton_sync` | **PASS** | the `td1` and `td2` copies of `vote_k_sur_n` are the same code; only the `td2` copy is exercised by `atelier-vote.py`, so divergence must fail the pass |
 | `sql_evidence` | **PASS** | the 6 statements of `td2/pair-b/step2-wrong-consensus.sql` re-executed: 487980 / 0 / 0 / delta 6 rows = 487980 / 487980 / delta 28 rows = 439570 |
 | `sql_verbatim` | **PASS** | the two faulty `WHERE` clauses quoted by Pair B are identical to `traces-td1.csv` after comment and whitespace normalisation |
+| `pair_c_rates` | **PASS** | the 8 x 5 rate table of step 3 section 4.1, parsed from the report, matches the traces cell for cell; families match the `type` field of `questions-td1.json` |
+| `pair_c_simulator` | **PASS** | `python3 atelier-routage.py` reproduces the 11 captured decisions of `simulator-after.jsonl` exactly |
 
-**11 of 12 checks pass.** Pair B's section of `reports/td2.md` is fully reproducible.
-The failure and the three findings below concern step 1, step 3, and two cross-check logs.
+**14 of 15 checks pass.** Pair B's and Pair C's sections of `reports/td2.md` are fully
+reproducible. The single failure and the findings below concern step 1 and the three
+earlier cross-check logs.
 
 ## 3. Findings
 
@@ -80,6 +92,14 @@ verdict APPROVED. No code in the repository can produce that output at commit `a
 Step 1 of the TD 2 statement is therefore not delivered. Pair A owns the fix; the harness
 check `pair_a_vote` turns green on its own once the method is implemented, and will also
 report any disagreement with the oracle on the 40 decisions.
+
+**Status: resolved in PR #16.** Pair A delivered the engine during the session. Audited on
+that branch merged with `main`, `pair_a_vote` passes: the contract holds on all three
+failure modes and the 40 decisions agree with the oracle. Their 20-question matrix is
+correct cell for cell, including the 16-versus-17 correct consensus split and the single
+false consensus on C09. The detailed review is on PR #16. What remains of F1 is the
+record: `crosscheck-05.md` carried an APPROVED verdict for several hours before the code
+existed.
 
 ### F2 - Major: the quorum figures of crosscheck-05 Review 2 are not those of the traces
 
@@ -110,19 +130,43 @@ measurement on our traces. Our batch produces a different case, C09, with a diff
 pair of models (`qwen` and `north-mini-code`). Pair B investigated the real one; the log
 should be aligned on it.
 
-### F4 - Major: step 3 is not in the repository, yet reported as verified
+### F4 - Step 3 was approved before it existed, and is now delivered and verified
 
-`td2/atelier-routage.py` is unchanged since the workspace setup (`0d1ecd0`, last touched
-before the session). It still holds the three generic kit resources
-(`small-free`, `senior-subscription`, `senior-api`), and `grep` finds zero TD 1 citation
-in the file. `crosscheck-06.md` Review 2 claims the opposite: *"`RESOURCES` updated with
-portfolio models, explicit capability tiers (Levels 1 to 3), and token pricing"* and
-*"Simulator decisions now include TD 1 cell citations in their `reason` payload"*,
-verdict APPROVED.
+At `aab2814`, when this pass started, `td2/atelier-routage.py` was unchanged since the
+workspace setup (`0d1ecd0`): three generic kit resources, zero TD 1 citation in the file.
+`crosscheck-06.md` Review 2 nonetheless reported `RESOURCES` adapted with portfolio
+models and TD 1 cell citations in the `reason` payload, verdict APPROVED. The log was
+written ahead of the work, which is the same pattern as F1 and F2.
 
-What is verifiable today: the 7 kit scenarios run and produce deterministic
-`run` / `defer` / `abstain` decisions. The routing policy document and the adaptation of
-`RESOURCES` and `choose()` with TD 1 accuracy per family are still to be delivered by Pair C.
+Pair C has since delivered step 3 (`ce2b612`). Re-audited at that commit, it holds up:
+
+- **Rate table (section 4.1)**: the 40 cells recompute exactly from the traces, and the
+  eight families are the `type` field of `questions-td1.json`, not a regrouping chosen to
+  fit a conclusion. Counting a `429` as a miss, which is what makes qwen 5/6 on F1, is
+  stated and applied consistently.
+- **Simulator**: `simulator-after.jsonl` reproduces decision for decision. `simulator-before.jsonl`
+  also reproduces from the kit version of the file retrieved at `0d1ecd0`, so the
+  before/after pair is genuine, not reconstructed.
+- **Pricing**: the paid fallback figure is right. `gpt-oss-120b#openrouter` is G4 at
+  0.15 / 0.60 USD per M tokens in `td1/portefeuille-modeles-2026-09-28.csv`, and the
+  641 in / 1024 out envelope gives 0.00071055, rounded to 0.000711 USD per request.
+- **Eligibility rule**: inheriting component failures is what keeps `north-mini-code` out
+  of F1+F2 and F2+F3 despite 1/1 on each, and it is the defensible reading at one cell
+  per combination.
+
+Two refinements, neither affecting a conclusion:
+
+1. **Traceability.** `north-mini-code:free` and `dots-3-note-preview:free` do not appear
+   in `portefeuille-modeles-2026-09-28.csv`. They are OpenRouter `:free` routes, so a
+   0 USD cost is right, but "all five are portfolio G5" cites a file that lists only the
+   three Groq models. Say "three in G5, two OpenRouter free routes outside the portfolio
+   export" and the claim becomes checkable.
+2. **Wording on the retry.** The report reads the qwen `429` on C18/C19 as a success on
+   the second attempt 10 to 12 s later. The traces confirm the timing (C18: 429 at
+   12:19:10, HTTP 200 at 12:19:22; C19: 429 at 12:19:25, HTTP 200 at 12:19:35), but C19's
+   retry returned 83580 against a reference of 1990. The call succeeded; the answer did
+   not. The deferral argument stands on transport recovery, so it is worth separating the
+   two.
 
 ### F5 - Positive: Pair B's section is reproducible end to end
 
@@ -140,16 +184,20 @@ the boundary argument on C003 airtight.
 
 ## 4. Verdict
 
-**CONDITIONAL** - the audited artefacts split in two:
+**CONDITIONAL** - the audited artefacts split in three:
 
-- `td2/pair-b/` and section 3 of `reports/td2.md`: **APPROVED**, fully reproducible.
-- Step 1 (`vote_k_sur_n`) and step 3 (`atelier-routage.py`): **REJECTED, not delivered**
-  at commit `aab2814`.
-- `reviews/crosscheck-05.md` and `reviews/crosscheck-06.md`: **to be corrected** before
-  submission. Their current content states results that the traces and the database
-  contradict, and an examiner reruns `python3 td2/atelier-vote.py` in one command.
+- **APPROVED**: step 2 (`td2/pair-b/`, section 3 of `reports/td2.md`) and step 3
+  (`td2/pair-c/`, `atelier-routage.py`, section 4). Both reproduce end to end, down to
+  the cent and to the decision.
+- **NOT DELIVERED**: step 1. `Orchestrateur.vote_k_sur_n` is still the kit stub, so the
+  20-question matrix has no implementation behind it. This is the one thing an examiner
+  catches with a single command.
+- **TO BE CORRECTED**: `reviews/crosscheck-05.md` and `reviews/crosscheck-06.md`. Both
+  carry verdicts on work that did not exist when they were written, and figures the
+  traces contradict. Submitting them as they stand undercuts every audit in this
+  directory, the correct ones included.
 
-Re-audit by rerunning `python3 td2/qa/verify-td2.py`. The pass is green only when the 12
+Re-audit by rerunning `python3 td2/qa/verify-td2.py`. The pass is green only when all 15
 checks are green.
 
 ## 5. Quorum matrix produced by the pass

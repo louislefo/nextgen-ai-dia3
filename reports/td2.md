@@ -346,7 +346,35 @@ A further reason applies to our data. The free route has TD 1 evidence, and the 
 
 ---
 
-## 5. Sub-Group Team Contributions
+## 5. Step 4: Plenary Presentation & Synthesis for TD 3
+
+During the Step 4 Plenary session (17:15 to 17:30), each sub-group presents its collective findings: comparing the quorum behaviors, explaining the wrong consensus, and defending the routing policy. Below is the synthesized plenary briefing developed by our sub-group:
+
+### 5.1 The Central Finding: Consensus Does Not Guarantee Ground Truth
+- **The Empirical Trap (Question C09)**: In a fixed 3-model panel (`gpt-oss-120b`, `cohere/north-mini-code`, `qwen/qwen3.8-27b`), two independent model architectures agreed on an identical value: `0` cents (ground truth: `487,980` cents). With a threshold of $k=2$, the 2-of-3 quorum validated a **False Consensus**.
+- **Root Cause & Attractor State**: While `gpt-oss-120b` correctly identified the age window (`2000-09-27` to `2001-09-26`), both Cohere and Qwen committed independent SQL syntax errors (Cohere subtracted strings, Qwen compared contradictory order-date intervals). In SQL, any empty WHERE filter combined with `COALESCE(SUM(...), 0)` returns `0`. Thus, `0` functions as an **attractor state**: distinct failure modes converge on `0` without sharing any reasoning.
+- **Quorum Resolution (2-of-3 vs 3-of-5)**: Expanding to a 3-of-5 quorum with $k=3$ brought in `gpt-oss-20b` (which correctly voted `487,980`) and `dots-studio` (which failed execution and cast 0 votes). The resulting 2 vs 2 vote tie fell short of $k=3$, successfully converting a catastrophic financial error into a **safe abstention** (`value: None`).
+- **Delta SQL Proof**: Executed on `data/boutique.sqlite`, the delta query isolated exactly 6 customers (C001, C002, C003, C007, C008, C009) responsible for all 487,980 cents, proving the exact cent discrepancy between reference and faulty models.
+
+### 5.2 Comparative Analysis of Quorums: Accuracy vs Latency & Cost
+Across the 20 benchmark questions:
+1. **False Consensus Elimination**: 2-of-3 produced 1 false consensus (5.0% error rate). 3-of-5 achieved **0.0% false consensus** (100% precision on reached consensus).
+2. **Consensus Recovery (Case C19)**: On C19 (product `d` for 25-year-olds), 2-of-3 abstained due to 1-1-1 dispersion (`1,990`, `13,930`, `83,580`). The 3-of-5 quorum recovered the true ground truth (`1,990` cents) with a 3/5 majority (`gpt-120b`, `gpt-20b`, `dots-studio`).
+3. **Resilience to Transient Errors (Cases C16 & C20)**: When Qwen was blocked by HTTP 429 quota limits, the quorum contract preserved $n=5$ while allowing healthy models to reach the required majority ($3/5$ and $4/5$).
+
+### 5.3 The Routing Policy & The "Price of Checking"
+- **Low Stakes / Simple Queries ($F_1$ Period, $F_3$ Product)**: All five TD 1 models scored 100% (or 5/6 due to transport). We route to the lowest-cost capable model (`gpt-oss-20b` or `qwen3.8-27b`) with zero check for internal dashboards and lightweight 2-of-3 quorums for customer-facing displays.
+- **High Stakes / Boundary Queries ($F_2$ Age, $F_2b$ Order Age, and Combinations)**: Only `openai/gpt-oss-120b` demonstrated 100% accuracy. All smaller models failed or produced false consensus.
+- **Architectural Consequence for TD 3**: **No free model is sufficient on its own for complex age calculations**. This sets the **price of checking** for TD 3:
+  1. Either execute an independent deterministic reference SQL query (local script route, 0 token cost).
+  2. Or dispatch to a paid flagship route (`openai/gpt-oss-120b` on OpenRouter at 0.000711 USD/request) with a 2-of-3 quorum.
+  3. Or enforce human review for high-impact payout figures.
+
+---
+
+## 6. Sub-Group Team Contributions & Verification
+
+### 6.1 Sub-Group Technical Ownership
 
 In accordance with the collaborative protocol defined for TD 2, the workload was systematically partitioned among three specialized engineering pairs:
 
@@ -356,16 +384,41 @@ In accordance with the collaborative protocol defined for TD 2, the workload was
 | **Group B** | **Baptiste Noailhac**<br>**Jean Jaunet**<br>**Romain Thepaut** | **Step 2**: SQL Diagnostics & Evidence Auditing | - Exhaustively audited the 100 TD 1 cells for shared incorrect values, identifying C09, C02, and C10.<br>- Dissected root-cause SQL logic flaws on C09 (`birth_year` without 2026 subtraction vs contradictory date window).<br>- Developed and executed the delta diagnostic query on `data/boutique.sqlite`, isolating 6 customer records and reconciling the entire 487,980-cent gap.<br>- Documented the non-zero false consensus on C10 and analyzed the SQLite timestamp comparison quirk on `DEMO-VOTE`.<br>- Hand-verified quorum vote counts and cross-checked against Pair A's automated outputs. |
 | **Pair C** | **Alexandre Jullien Gaildraud**<br>**Valentin Gourmelon** | **Step 3**: Dynamic Routing & Simulation | - Derived the 8x5 empirical accuracy rate matrix across question families directly from `traces-td1.csv`.<br>- Authored the 1-page dynamic routing policy establishing lowest-cost eligible dispatch and risk-tiered checks.<br>- Adapted `atelier-routage.py` with portfolio pricing and empirical TD 1 cell justification strings.<br>- Executed and logged 11 simulation scenarios (`simulator-before.jsonl` vs `simulator-after.jsonl`).<br>- Analytically justified the queue priority order in `choose` (subscription allocation vs free refill deferral) and identified condition inversion criteria. |
 
+### 6.2 Individual Role Distribution & Contribution Tracking
+
+| Member | Pair / Role | Primary Ownership | Specific Deliverables & Evidence | Peer Cross-Checked By |
+|---|---|---|---|---|
+| **Louis Le Forestier** | Pair A (Consensus) | Quorum Voting Engine | `skeleton-multi-llm-en.py` (`vote_k_sur_n`), synthetic test suite, 20-question matrix | Maxime Laurent & Group B |
+| **Maxime Laurent** | Pair A (Consensus) | Quorum Benchmarking | Comparative analysis (2-of-3 vs 3-of-5), transitions C09 & C19, `td2/pair-a/` | Louis Le Forestier & Group C |
+| **Baptiste Noailhac** | Pair B (Diagnostics) | False Consensus C09 | Trace audit across 100 cells, hand counts vs engine, `td2/pair-b/step2-crosscheck.md` | Jean Jaunet & Romain Thepaut |
+| **Jean Jaunet** | Pair B (Diagnostics) | SQL Delta Analysis | Executable delta SQL queries on `boutique.sqlite`, cent reconciliation (487,980 cts) | Baptiste Noailhac & Pair A |
+| **Alexandre Jullien Gaildraud**| Pair C (Routing) | Routing Policy | 1-page rule, empirical TD 1 accuracy mapping per family, checking tiers | Valentin Gourmelon & Group B |
+| **Valentin Gourmelon** | Pair C (Routing) | Simulator Adaptation | `atelier-routage.py` (`RESOURCES` & `choose`), `simulator-after.jsonl`, queue priority analysis | Alexandre Jullien Gaildraud & Pair A |
+| **Romain Thepaut** | Group B & QA Lead | Automated Test Harness | `td2/qa/verify-td2.py` (12/12 automated checks), SQL audits, `reviews/crosscheck-07.md` | Whole Sub-group |
+
+### 6.3 Pre-Submission Verification Checklist
+
+Prior to final submission, the entire deliverable suite was validated offline using the automated QA harness:
+
+- [x] **`db_fingerprint`**: SHA-256 of `boutique.sqlite` matches official manifest (`0077e235adc2ca647b484e3083c98a6d7cae3ef3655ce366a299caf13398fec2`).
+- [x] **`trace_inventory`**: 104 rows, 100 cells, 20 questions, 5 models, all `nature = real`.
+- [x] **`reference_queries`**: All 20 SQL reference queries verified on SQLite, reproducing all values.
+- [x] **`pair_a_vote`**: Strict majority check, duplicate refusal, and all 40 quorum decisions match the independent oracle.
+- [x] **`skeleton_sync`**: `vote_k_sur_n` identical between `td1/skeleton-multi-llm-en.py` and `td2/skeleton-multi-llm-en.py`.
+- [x] **`sql_evidence`**: Statements in `td2/pair-b/step2-wrong-consensus.sql` re-executed; 487,980 cts reconciliation verified.
+- [x] **`pair_c_simulator`**: `atelier-routage.py` reproduces all 11 decisions in `simulator-after.jsonl`.
+- [x] **Automated Harness Pass**: `python td2/qa/verify-td2.py` reports **PASS**.
+
 ---
 
-## 6. Key Takeaways, Limitations & Preparation for TD 3
+## 7. Actionable Roadmap & Preparation for TD 3
 
-### 6.1 Experimental Takeaways
+### 7.1 Experimental Takeaways
 1. **Consensus Is Not Correctness**: Two distinct model architectures (`cohere/north-mini-code:free` and `qwen/qwen3.8-27b`) can generate completely different invalid SQL queries that both produce `0` because empty relational filters converge on `COALESCE(SUM(...), 0)`. Agreement on zero is weak evidence.
 2. **Quorum Filtering Dynamics**: Expanding the quorum from 2-of-3 to 3-of-5 eliminated 100% of false consensus cases in our batch (converting C09 into a safe abstention) and recovered true consensus on C19 (`1,990` cents). However, an abstention provides no operational answer, proving that high-stakes questions require external verification.
 3. **The Price of Checking**: For question families involving completed customer age ($F2$, $F2b$), only `openai/gpt-oss-120b` achieved 100% reliability in TD 1. Because free quorums can fail collectively, figures exposed to customers or financial payouts strictly require deterministic reference checks (local SQL queries) or human sign-off.
 
-### 6.2 Actionable Roadmap for TD 3 (Quantification & Architectural Decision)
+### 7.2 Actionable Roadmap for TD 3 (Quantification & Architectural Decision)
 - **Configuration Benchmarking**: Quantify five production serving configurations across the 20 benchmark questions:
   1. *Cheapest Single Model*: Lowest-cost eligible model per question family.
   2. *Best Single Model Overall*: Standalone `openai/gpt-oss-120b`.
@@ -375,11 +428,8 @@ In accordance with the collaborative protocol defined for TD 2, the workload was
 - **Dual-Column Cost Accounting**: Compute total token costs based on official portfolio pricing (`portefeuille-modeles-2026-09-28.csv`) alongside actual cash spend (0 USD for free routes).
 - **Production Use Case & Pitch Deck**: Formalize an operational business deployment (Internal Dashboard vs Customer Display vs Financial Payout) and prepare the 3-slide presentation deck for table evaluation on 11 December 2026.
 
-### 6.3 Hand-in & Reproducibility Checklist
-- [x] `skeleton-multi-llm-en.py` with `vote_k_sur_n` fully implemented and passing all tests.
-- [x] 20-question comparison matrix (2-of-3 vs 3-of-5) verified against `reference-td1.csv`.
-- [x] Shared false consensus C09 verified on `data/boutique.sqlite` with executable delta query.
-- [x] 1-page routing policy with 8x5 empirical rate table and adapted simulator outputs.
-- [x] All 15 offline verification checks passing in `td2/qa/verify-td2.py`.
-- [x] Complete session report published in `reports/td2.md`.
-
+### 7.3 Hand-in Metadata
+- **Repository URL**: `https://github.com/louislefo/nextgen-ai-dia3.git`
+- **Target Deliverable**: `reports/td2.md`
+- **Database Seed**: `20260925`
+- **Course & Session**: ESILV DIA 3 - Trustworthy Generative AI - TD 2 (18 November 2026)
