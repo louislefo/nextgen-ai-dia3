@@ -1,4 +1,4 @@
-# Trustworthy Generative AI - DIA 3 - Group 2
+# Trustworthy Generative AI - DIA 3 - Group 2 
 
 **Institution**: ESILV - Major Data & Artificial Intelligence (Year 4 / S7)  
 **Course**: Next-Generation AI - Trustworthy Generative AI (Didier Parisot)  
