@@ -17,7 +17,7 @@
   4. **Jean Jaunet** (`jean.jaunet@edu.devinci.fr`) - Database Investigation & SQL Modeling
   5. **Alexandre Jullien Gaildraud** (`alexandre.jullien_gaildraud@edu.devinci.fr`) - Routing Policy Architect
   6. **Valentin Gourmelon** (`valentin.gourmelon@edu.devinci.fr`) - Simulator & Concurrency Coordinator
-  7. **Romain Thepaut** (`romain.thepaut@edu.devinci.fr`) - QA, Audit & Verification Engineer
+  7. **Romain Thepaut** (`romain.thepaut@edu.devinci.fr`) - SQL Investigation & Evidence Auditor (Group B)
 
 ---
 
@@ -72,6 +72,12 @@ nextgen-ai-dia3/
 │   └── traces-td1.csv                  # TD 1 master inference trace log
 ├── td3/                                # TD 3: Costing and business decision workspace
 │   └── README.md                       # TD 3 preparation guide, costing model & pitch framework
+├── reviews/                            # Peer cross-check logs & quality audits
+│   ├── README.md                       # Cross-check directory index and methodology
+│   ├── crosscheck-01.md ... 03.md      # TD 1 SQL reference cross-checks (6 reviews)
+│   ├── crosscheck-04.md                # TD 1 multi-model trace & pacing audits (2 reviews)
+│   ├── crosscheck-05.md                # TD 2 voting quorum engine audits (2 reviews)
+│   └── crosscheck-06.md                # TD 2 false consensus & routing audits (2 reviews)
 ├── website/                            # GitHub Pages live interactive portal
 │   ├── css/style.css                   # Custom responsive stylesheet
 │   ├── index.html                      # Executive project dashboard & team presentation
